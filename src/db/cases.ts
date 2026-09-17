@@ -233,3 +233,28 @@ export async function markAllFound(db: SarfDB, requestId: number): Promise<numbe
   }
   return unknown
 }
+
+export interface DeletedCase {
+  request: Request
+  items: Item[]
+}
+
+// Permanently removes a case and all of its meds. The person (card, name,
+// rank) is kept for next time. Returns what was deleted so it can be undone.
+export async function deleteCase(db: SarfDB, requestId: number): Promise<DeletedCase | null> {
+  return db.transaction('rw', db.requests, db.items, async () => {
+    const request = await db.requests.get(requestId)
+    if (!request) return null
+    const items = await db.items.where('requestId').equals(requestId).toArray()
+    await db.items.bulkDelete(items.map((i) => i.id!))
+    await db.requests.delete(requestId)
+    return { request, items }
+  })
+}
+
+export async function restoreCase(db: SarfDB, deleted: DeletedCase): Promise<void> {
+  await db.transaction('rw', db.requests, db.items, async () => {
+    await db.requests.put(deleted.request)
+    await db.items.bulkPut(deleted.items)
+  })
+}

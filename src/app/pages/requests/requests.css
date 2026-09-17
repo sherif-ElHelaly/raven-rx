@@ -554,3 +554,7 @@
   width: 100%;
   min-width: 0;
 }
+
+.case-delete-btn {
+  margin-top: var(--space-3);
+}

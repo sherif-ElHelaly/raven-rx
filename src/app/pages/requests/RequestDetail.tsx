@@ -3,7 +3,9 @@ import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
   closeCase,
+  deleteCase,
   markAllFound,
+  restoreCase,
   setCaseFeeRefunded,
   summarizeCase,
 } from '../../../db/cases'
@@ -25,6 +27,7 @@ export function RequestDetail() {
   const [pickForItems, setPickForItems] = useState<number[] | null>(null)
   const [closing, setClosing] = useState(false)
   const [closeCollected, setCloseCollected] = useState(true)
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
 
   const request = useLiveQuery(() => db.requests.get(id), [id])
   const person = useLiveQuery(
@@ -135,6 +138,17 @@ export function RequestDetail() {
     }
   }
 
+  const handleDelete = async () => {
+    setConfirmingDelete(false)
+    const deleted = await deleteCase(db, id)
+    navigate('/requests', { replace: true })
+    if (deleted) {
+      showToast('Case deleted', () => {
+        restoreCase(db, deleted)
+      })
+    }
+  }
+
   return (
     <div className="page">
       <div className="top-bar top-bar--inline">
@@ -228,6 +242,34 @@ export function RequestDetail() {
         >
           Close case…
         </button>
+      )}
+
+      <button
+        type="button"
+        className="btn btn--danger btn--block case-delete-btn"
+        onClick={() => setConfirmingDelete(true)}
+      >
+        Delete case…
+      </button>
+
+      {confirmingDelete && (
+        <div className="sheet-backdrop" onClick={() => setConfirmingDelete(false)}>
+          <div className="sheet" onClick={(e) => e.stopPropagation()}>
+            <div className="sheet__handle" />
+            <p className="sheet__title">Delete this case?</p>
+            <p className="settings-section__hint">
+              Removes this case and its {items.length} med{items.length === 1 ? '' : 's'}
+              {summary.owed > 0 ? `, including the ${summary.owed} EGP owed` : ''}.{' '}
+              {personTitle(person)}’s card, name and rank are kept. You can undo right after.
+            </p>
+            <button type="button" className="btn btn--danger btn--block" onClick={handleDelete}>
+              Delete case
+            </button>
+            <button type="button" className="sheet__cancel" onClick={() => setConfirmingDelete(false)}>
+              Cancel
+            </button>
+          </div>
+        </div>
       )}
 
       {pickForItems && (

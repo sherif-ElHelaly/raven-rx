@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import {
   closeCase,
+  deleteCase,
   handOverCase,
   homeTotals,
   isStaleCase,
@@ -8,6 +9,7 @@ import {
   loadCases,
   markAllFound,
   moneyOwed,
+  restoreCase,
   setCaseFeeRefunded,
 } from './cases'
 import {
@@ -229,5 +231,31 @@ describe('remembered pharmacies', () => {
       groupLabel: 'Hospital pharmacies',
       locationId: undefined,
     })
+  })
+})
+
+describe('deleting cases', () => {
+  it('removes the case and its meds but keeps the person, and can be undone', async () => {
+    const keep = await newCase('1717', 'monthly', 1)
+    const { requestId, itemIds } = await newCase('1818', 'bimonthly', 3)
+    await setItemStatus(db, itemIds[0]!, 'delivered')
+
+    const deleted = await deleteCase(db, requestId)
+    expect(deleted?.items).toHaveLength(3)
+    expect(await db.requests.get(requestId)).toBeUndefined()
+    expect(await db.items.where('requestId').equals(requestId).count()).toBe(0)
+    expect(await db.people.where('cardNumber').equals('1818').count()).toBe(1)
+    expect(await db.items.where('requestId').equals(keep.requestId).count()).toBe(1)
+    expect(await moneyOwed(db)).toBe(5)
+
+    await restoreCase(db, deleted!)
+    const c = await caseById(requestId)
+    expect(c.items).toHaveLength(3)
+    expect(c.counts.delivered).toBe(1)
+    expect(await moneyOwed(db)).toBe(35)
+  })
+
+  it('returns null for a case that does not exist', async () => {
+    expect(await deleteCase(db, 999)).toBeNull()
   })
 })

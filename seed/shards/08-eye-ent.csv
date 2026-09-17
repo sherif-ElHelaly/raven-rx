@@ -1,0 +1,68 @@
+brand_en,brand_ar,ingredients,strength,form,pack_size,manufacturer,categories,drug_class,use_en,fridge,controlled,confidence,source
+Tobrex,توبريكس,tobramycin,0.3%,eye drops,5 mL,Alcon,ophthalmic;antibiotic,aminoglycoside antibiotic,bacterial eye infection,no,no,high,https://tdawi.com/en_eg/medicines/tobrex-0-3-eye-drops-5-ml
+Tobrex,توبريكس,tobramycin,0.3%,eye ointment,3.5 g,Alcon,ophthalmic;antibiotic,aminoglycoside antibiotic,bacterial eye infection,no,no,medium,
+Garamycin,جاراميسين,gentamicin,0.3%,eye drops,5 mL,,ophthalmic;antibiotic,aminoglycoside antibiotic,bacterial eye infection,no,no,medium,
+Ciloxan,سيلوكسان,ciprofloxacin,0.3%,eye drops,5 mL,Alcon,ophthalmic;antibiotic,fluoroquinolone antibiotic,bacterial eye infection,no,no,medium,
+Ciloxan,سيلوكسان,ciprofloxacin,0.3%,eye ointment,3.5 g,Alcon,ophthalmic;antibiotic,fluoroquinolone antibiotic,bacterial eye infection,no,no,medium,
+Vigamox,فيجاموكس,moxifloxacin,0.5%,eye drops,5 mL,Alcon,ophthalmic;antibiotic,fluoroquinolone antibiotic,bacterial eye infection,no,no,high,https://tdawi.com/en_eg/vigamox-eye-drops-5-ml
+Fucithalmic,فيوسيثالميك,fusidic acid,1%,eye drops,5 g,Leo Pharma,ophthalmic;antibiotic,fusidane antibiotic,bacterial eye infection,no,no,medium,
+Kemicetine,كيميستين,chloramphenicol,0.5%,eye drops,10 mL,,ophthalmic;antibiotic,broad-spectrum antibiotic,bacterial eye infection,no,no,medium,
+Tobradex,توبرادكس,tobramycin;dexamethasone,0.3%/0.1%,eye drops,5 mL,Alcon,ophthalmic;corticosteroid;antibiotic,antibiotic + corticosteroid combination,eye inflammation with infection,no,no,high,https://tdawi.com/en_eg/tobradex-eye-drops-5-ml
+Tobradex,توبرادكس,tobramycin;dexamethasone,0.3%/0.1%,eye ointment,3.5 g,Alcon,ophthalmic;corticosteroid;antibiotic,antibiotic + corticosteroid combination,eye inflammation with infection,no,no,high,https://tdawi.com/en_eg/tobradex-eye-ointment-3-5-gm
+Maxitrol,ماكسيترول,dexamethasone;neomycin;polymyxin b,0.1%/0.35%/6000 IU/mL,eye drops,5 mL,Alcon,ophthalmic;corticosteroid;antibiotic,antibiotic + corticosteroid combination,eye inflammation with infection,no,no,medium,
+Maxitrol,ماكسيترول,dexamethasone;neomycin;polymyxin b,0.1%/0.35%/6000 IU/g,eye ointment,3.5 g,Alcon,ophthalmic;corticosteroid;antibiotic,antibiotic + corticosteroid combination,eye inflammation with infection,no,no,medium,
+Pred Forte,بريد فورت,prednisolone acetate,1%,eye drops,5 mL,Allergan,ophthalmic;corticosteroid,corticosteroid,eye inflammation,no,no,medium,
+FML,اف ام ال,fluorometholone,0.1%,eye drops,5 mL,Allergan,ophthalmic;corticosteroid,corticosteroid,eye inflammation,no,no,medium,
+Timoptic,تيموبتيك,timolol,0.5%,eye drops,5 mL,MSD,ophthalmic,beta-blocker,glaucoma eye pressure,no,no,medium,
+Timolol,تيمولول,timolol,0.5%,eye drops,5 mL,EIPICO,ophthalmic,beta-blocker,glaucoma eye pressure,no,no,high,https://tdawi.com/en_eg/timolol-0-5-eye-drops-5ml
+Xalatan,زالاتان,latanoprost,0.005%,eye drops,2.5 mL,Pfizer,ophthalmic,prostaglandin analogue,glaucoma eye pressure,yes,no,medium,
+Travatan,ترافاتان,travoprost,0.004%,eye drops,2.5 mL,Alcon,ophthalmic,prostaglandin analogue,glaucoma eye pressure,no,no,medium,
+Lumigan,لوميجان,bimatoprost,0.03%,eye drops,3 mL,Allergan,ophthalmic,prostaglandin analogue,glaucoma eye pressure,no,no,medium,
+Cosopt,كوسوبت,dorzolamide;timolol,2%/0.5%,eye drops,5 mL,MSD,ophthalmic,carbonic anhydrase inhibitor + beta-blocker,glaucoma eye pressure,no,no,high,https://tdawi.com/en_eg/cosopt-eye-drops-5-ml
+Alphagan,الفاجان,brimonidine,0.2%,eye drops,5 mL,Allergan,ophthalmic,alpha-2 agonist,glaucoma eye pressure,no,no,medium,
+Azopt,ازوبت,brinzolamide,1%,eye drops,5 mL,Alcon,ophthalmic,carbonic anhydrase inhibitor,glaucoma eye pressure,no,no,medium,
+Xalacom,زالاكوم,latanoprost;timolol,0.005%/0.5%,eye drops,2.5 mL,Pfizer,ophthalmic,prostaglandin analogue + beta-blocker,glaucoma eye pressure,yes,no,medium,
+Ganfort,جانفورت,bimatoprost;timolol,0.03%/0.5%,eye drops,3 mL,Allergan,ophthalmic,prostaglandin analogue + beta-blocker,glaucoma eye pressure,no,no,medium,
+Combigan,كومبيجان,brimonidine;timolol,0.2%/0.5%,eye drops,5 mL,Allergan,ophthalmic,alpha-2 agonist + beta-blocker,glaucoma eye pressure,no,no,medium,
+DuoTrav,دوتراف,travoprost;timolol,0.004%/0.5%,eye drops,2.5 mL,Alcon,ophthalmic,prostaglandin analogue + beta-blocker,glaucoma eye pressure,no,no,high,https://tdawi.com/en_eg/duotrav-eye-drops-2-5-ml
+Trusopt,تروسوبت,dorzolamide,2%,eye drops,5 mL,MSD,ophthalmic,carbonic anhydrase inhibitor,glaucoma eye pressure,no,no,medium,
+Betoptic S,بيتوبتيك اس,betaxolol,0.25%,eye drops,5 mL,Alcon,ophthalmic,beta-blocker,glaucoma eye pressure,no,no,medium,
+Iopidine,يوبيدين,apraclonidine,1%,eye drops,5 mL,Alcon,ophthalmic,alpha-2 agonist,glaucoma eye pressure,no,no,medium,
+Systane,سيستان,polyethylene glycol 400;propylene glycol,0.4%/0.3%,eye drops,10 mL,Alcon,ophthalmic,lubricant,dry eyes,no,no,medium,
+Refresh Tears,ريفريش تيرز,carmellose,0.5%,eye drops,15 mL,Allergan,ophthalmic,lubricant,dry eyes,no,no,high,https://dwaprices.com/med.php?id=21528
+Refresh Plus,ريفريش بلس,carmellose,0.5%,eye drops,single-dose vials,Allergan,ophthalmic,lubricant,dry eyes,no,no,high,https://dwaprices.com/med.php?id=21528
+Refresh Liquigel,ريفريش ليكويجيل,carmellose,1%,eye gel,10 mL,Allergan,ophthalmic,lubricant,dry eyes,no,no,high,https://dwaprices.com/med.php?id=21528
+Optive,اوبتيف,carmellose;glycerin,0.5%/0.9%,eye drops,15 mL,Allergan,ophthalmic,lubricant,dry eyes,no,no,high,http://egyptiandrugstore.com/index.php?route=product/product&product_id=1965
+Viscotears,فيسكوتيرز,carbomer,0.2%,eye gel,10 g,Bausch+Lomb,ophthalmic,lubricant,dry eyes,no,no,medium,
+Artelac,ارتيلاك,hypromellose,0.32%,eye drops,10 mL,Bausch+Lomb,ophthalmic,lubricant,dry eyes,no,no,medium,
+Genteal,جينتيل,hypromellose,0.3%,eye gel,10 g,Alcon,ophthalmic,lubricant,dry eyes,no,no,medium,
+Corneregel,كورنيريجيل,dexpanthenol,5%,eye gel,10 g,Bausch+Lomb,ophthalmic,corneal healing agent,dry eyes and corneal healing,no,no,medium,
+Acular,اكيولار,ketorolac,0.5%,eye drops,5 mL,Allergan,ophthalmic;anti-inflammatory,NSAID,eye inflammation and pain,no,no,medium,
+Nevanac,نيفاناك,nepafenac,0.1%,eye drops,3 mL,Alcon,ophthalmic;anti-inflammatory,NSAID,eye inflammation after surgery,no,no,medium,
+Voltaren Ophtha,فولتارين افثا,diclofenac,0.1%,eye drops,5 mL,Novartis,ophthalmic;anti-inflammatory,NSAID,eye inflammation after surgery,no,no,medium,
+Indocollyre,اندوكولير,indomethacin,0.1%,eye drops,5 mL,Bausch+Lomb,ophthalmic;anti-inflammatory,NSAID,eye inflammation after surgery,no,no,medium,
+Mydriacyl,ميدرياسيل,tropicamide,0.5%,eye drops,15 mL,Alcon,ophthalmic,mydriatic-cycloplegic,pupil dilation for eye exam,no,no,medium,
+Mydriacyl,ميدرياسيل,tropicamide,1%,eye drops,15 mL,Alcon,ophthalmic,mydriatic-cycloplegic,pupil dilation for eye exam,no,no,medium,
+Cyclogyl,سيكلوجيل,cyclopentolate,1%,eye drops,15 mL,Alcon,ophthalmic,mydriatic-cycloplegic,pupil dilation for eye exam,no,no,medium,
+Alcaine,الكايين,proparacaine,0.5%,eye drops,15 mL,Alcon,ophthalmic,topical anesthetic,numbing eye for procedures,no,no,medium,
+Zovirax,زوفيراكس,acyclovir,3%,eye ointment,4.5 g,GSK,ophthalmic;antiviral,antiviral,viral eye infection,no,no,medium,
+Opatanol,اوباتانول,olopatadine,0.1%,eye drops,5 mL,Novartis,ophthalmic;allergy,antihistamine,eye allergy itching,no,no,medium,
+Zaditen,زاديتين,ketotifen,0.025%,eye drops,5 mL,,ophthalmic;allergy,antihistamine mast cell stabilizer,eye allergy itching,no,no,high,http://egyptiandrugstore.com/index.php?route=product/product&product_id=725
+Olohistine,اولوهيستين,olopatadine,0.1%,eye drops,5 mL,,ophthalmic;allergy,antihistamine,eye allergy itching,no,no,high,http://egyptiandrugstore.com/index.php?route=product/product&product_id=1978
+Opticrom,اوبتيكروم,sodium cromoglicate,2%,eye drops,10 mL,Sanofi,ophthalmic;allergy,mast cell stabilizer,eye allergy itching,no,no,medium,
+Sofradex,سوفرادكس,dexamethasone;framycetin;gramicidin,0.05%/0.5%/0.005%,ear drops,8 mL,Sanofi,ent;antibiotic;corticosteroid,antibiotic + corticosteroid combination,ear infection and inflammation,no,no,medium,
+Otosporin,اوتوسبورين,polymyxin b;neomycin;hydrocortisone,10000 IU/mL/0.34%/1%,ear drops,8 mL,GSK,ent;antibiotic;corticosteroid,antibiotic + corticosteroid combination,ear infection and inflammation,no,no,medium,
+Ciprodex,سيبروديكس,ciprofloxacin;dexamethasone,0.3%/0.1%,ear drops,7.5 mL,Alcon,ent;antibiotic;corticosteroid,antibiotic + corticosteroid combination,ear infection and inflammation,no,no,medium,
+Otrivin,اوتريفين,xylometazoline,0.1%,nasal spray,10 mL,,ent,nasal decongestant,nasal congestion,no,no,medium,
+Otrivin,اوتريفين,xylometazoline,0.05%,nasal drops,10 mL,,ent,nasal decongestant,nasal congestion in children,no,no,medium,
+Afrin,افرين,oxymetazoline,0.05%,nasal spray,15 mL,Bayer,ent,nasal decongestant,nasal congestion,no,no,medium,
+Flixonase,فليكسونيز,fluticasone propionate,0.05%,nasal spray,150 doses,GSK,ent;allergy;corticosteroid,corticosteroid,nasal allergy congestion,no,no,medium,
+Nasonex,نازونكس,mometasone furoate,0.05%,nasal spray,140 doses,MSD,ent;allergy;corticosteroid,corticosteroid,nasal allergy congestion,no,no,medium,
+Rhinocort,رينوكورت,budesonide,0.064%,nasal spray,120 doses,AstraZeneca,ent;allergy;corticosteroid,corticosteroid,nasal allergy congestion,no,no,medium,
+Allergodil,الرجوديل,azelastine,0.1%,nasal spray,10 mL,,ent;allergy,antihistamine,nasal allergy congestion,no,no,medium,
+Sterimar,ستيريمار,sodium chloride,,nasal spray,50 mL,,ent,isotonic seawater nasal wash,nasal congestion and hygiene,no,no,medium,
+Tantum Verde,تانتوم فيردي,benzydamine,0.15%,mouthwash,240 mL,Angelini,oral-dental,nonsteroidal anti-inflammatory analgesic,sore throat and mouth pain,no,no,medium,
+Tantum Verde,تانتوم فيردي,benzydamine,3 mg,lozenge,20 lozenges,Angelini,oral-dental,nonsteroidal anti-inflammatory analgesic,sore throat and mouth pain,no,no,medium,
+Hexitol,هيكسيتول,chlorhexidine,0.2%,mouthwash,200 mL,,oral-dental,antiseptic,mouth and gum antisepsis,no,no,medium,
+Strepsils,ستربسيلز,amylmetacresol;dichlorobenzyl alcohol,0.6/1.2 mg,lozenge,24 lozenges,Reckitt,oral-dental,antiseptic,sore throat relief,no,no,medium,
+Daktarin Oral Gel,دكتارين جل فموي,miconazole,2%,oral gel,40 g,Janssen,oral-dental;antifungal,antifungal,oral thrush fungal infection,no,no,medium,

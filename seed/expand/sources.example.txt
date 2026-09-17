@@ -1,0 +1,16 @@
+# One brand or topic per line. Lines starting with # are ignored.
+# Copy this file to sources.txt (or pass --input) and run:
+#   node seed/expand_seed.mjs --input seed/expand/sources.txt
+#
+# Gaps called out in VISION.md §8 "Known gaps and doubts":
+ivabradine brands in Egypt
+edoxaban brands in Egypt
+prasugrel brands in Egypt
+sublingual, patch and IV nitroglycerin brands in Egypt
+lipid-lowering (statin/fibrate) brands in Egypt
+cold and flu combination brands in Egypt
+Toplexil cough syrup, Egypt strength and ingredients
+Bronchicum cough syrup, Egypt strength and ingredients
+Rhinofed, Egypt strength and ingredients
+Epiduo gel, Egypt strength and ingredients
+Triderm cream, Egypt strength and ingredients

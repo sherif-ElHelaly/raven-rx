@@ -1,0 +1,42 @@
+.photo-input {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.photo-input__preview {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.photo-input__placeholder {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  border: 1px dashed var(--color-border);
+  color: var(--color-text-dim);
+  font-size: 10px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.photo-input__actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.photo-thumb {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  flex-shrink: 0;
+}

@@ -1,0 +1,37 @@
+.location-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.location-list__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 13px var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: var(--color-text);
+}
+
+.location-list__name {
+  display: block;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.location-list__type {
+  display: block;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.location-list__flags {
+  flex-shrink: 0;
+}

@@ -1,0 +1,120 @@
+brand_en,brand_ar,ingredients,strength,form,pack_size,manufacturer,categories,drug_class,use_en,fridge,controlled,confidence,source
+Prozac,بروزاك,fluoxetine,20 mg,capsule,14 capsules,Eli Lilly,psychiatric,ssri antidepressant,depression and anxiety,no,no,high,https://dwaprices.com/med.php?id=25454
+Philozac,فيلوزاك,fluoxetine,20 mg,capsule,30 capsules,,psychiatric,ssri antidepressant,depression and anxiety,no,no,high,https://dwaprices.com/med.php?id=24887
+Fluoxetine,فلوكسيتين,fluoxetine,20 mg,capsule,10 capsules,,psychiatric,ssri antidepressant,depression and anxiety,no,no,high,https://dwaprices.com/med.php?id=5026
+Lustral,لوستال,sertraline,50 mg,film-coated tablet,20 tablets,Pfizer,psychiatric,ssri antidepressant,depression and anxiety,no,no,high,https://dwaprices.com/ause.php?id=50
+Serlift,سيرليفت,sertraline,100 mg,film-coated tablet,10 tablets,EIPICO,psychiatric,ssri antidepressant,depression and anxiety,no,no,high,https://dwaprices.com/med.php?id=26837
+Serlift,سيرليفت,sertraline,50 mg,film-coated tablet,30 tablets,EIPICO,psychiatric,ssri antidepressant,depression and anxiety,no,no,medium,
+Cipralex,سيبرالكس,escitalopram,10 mg,film-coated tablet,28 tablets,Lundbeck,psychiatric,ssri antidepressant,depression and anxiety,no,no,high,https://dwaprices.com/med.php?id=16358
+Cipralex,سيبرالكس,escitalopram,20 mg,film-coated tablet,28 tablets,Lundbeck,psychiatric,ssri antidepressant,depression and anxiety,no,no,medium,
+Ciprapro,سيبرابرو,escitalopram,10 mg,film-coated tablet,30 tablets,,psychiatric,ssri antidepressant,depression and anxiety,no,no,high,https://dwaprices.com/ause.php?id=50
+Estikan,إستيكان,escitalopram,10 mg,tablet,14 tablets,,psychiatric,ssri antidepressant,depression and anxiety,no,no,high,https://dwaprices.com/ause.php?id=50
+Seroxat,سيروكسات,paroxetine,20 mg,film-coated tablet,30 tablets,GSK,psychiatric,ssri antidepressant,depression and anxiety,no,no,high,https://dwaprices.com/ause.php?id=50
+Seroxat CR,سيروكسات سي ار,paroxetine,12.5 mg,extended-release tablet,30 tablets,GSK,psychiatric,ssri antidepressant,depression and anxiety,no,no,high,https://dwaprices.com/ause.php?id=50
+Faverin,فافيرين,fluvoxamine,50 mg,film-coated tablet,60 tablets,Abbott,psychiatric,ssri antidepressant,depression and obsessive-compulsive disorder,no,no,high,https://dwaprices.com/ause.php?id=50
+Faverin,فافيرين,fluvoxamine,100 mg,film-coated tablet,30 tablets,Abbott,psychiatric,ssri antidepressant,depression and obsessive-compulsive disorder,no,no,high,https://dwaprices.com/ause.php?id=50
+Efexor XR,ايفكسور اكس ار,venlafaxine,75 mg,extended-release capsule,14 capsules,Pfizer,psychiatric,snri antidepressant,depression and anxiety,no,no,high,https://dwaprices.com/ause.php?id=50
+Efexor XR,ايفكسور اكس ار,venlafaxine,150 mg,extended-release capsule,14 capsules,Pfizer,psychiatric,snri antidepressant,depression and anxiety,no,no,high,https://dwaprices.com/ause.php?id=50
+Effegad,ايفيجاد,venlafaxine,150 mg,extended-release capsule,28 capsules,,psychiatric,snri antidepressant,depression and anxiety,no,no,high,https://dwaprices.com/ause.php?id=50
+Cymbalta,سيمبالتا,duloxetine,30 mg,extended-release capsule,28 capsules,Eli Lilly,psychiatric,snri antidepressant,depression and nerve pain,no,no,high,https://dwaprices.com/ause.php?id=50
+Cymbalta,سيمبالتا,duloxetine,60 mg,extended-release capsule,28 capsules,Eli Lilly,psychiatric,snri antidepressant,depression and nerve pain,no,no,high,https://dwaprices.com/ause.php?id=50
+Cymbatex,سيمباتكس,duloxetine,30 mg,extended-release capsule,30 capsules,,psychiatric,snri antidepressant,depression and nerve pain,no,no,high,https://dwaprices.com/ause.php?id=50
+Duloxeprin,دولوكسبرين,duloxetine,30 mg,extended-release capsule,28 capsules,,psychiatric,snri antidepressant,depression and nerve pain,no,no,high,https://dwaprices.com/ause.php?id=50
+Karbalta,كاربالتا,duloxetine,30 mg,extended-release capsule,28 capsules,,psychiatric,snri antidepressant,depression and nerve pain,no,no,high,https://dwaprices.com/ause.php?id=50
+Tryptizol,تريبتيزول,amitriptyline,25 mg,film-coated tablet,30 tablets,,psychiatric,tricyclic antidepressant,depression and chronic pain,no,no,high,https://dwaprices.com/ause.php?id=50
+Tryptizol,تريبتيزول,amitriptyline,10 mg,film-coated tablet,60 tablets,,psychiatric,tricyclic antidepressant,depression and chronic pain,no,no,high,https://dwaprices.com/ause.php?id=50
+Tofranil,توفرانيل,imipramine,25 mg,tablet,50 tablets,Novartis,psychiatric,tricyclic antidepressant,depression and bedwetting,no,no,high,https://dwaprices.com/ause.php?id=50
+Anafranil,انافرانيل,clomipramine,25 mg,tablet,30 tablets,Novartis,psychiatric,tricyclic antidepressant,depression and obsessive-compulsive disorder,no,no,high,https://dwaprices.com/ause.php?id=50
+Anafranil SR,انافرانيل اس ار,clomipramine,75 mg,extended-release tablet,20 tablets,Novartis,psychiatric,tricyclic antidepressant,depression and obsessive-compulsive disorder,no,no,high,https://dwaprices.com/ause.php?id=50
+Remeron,ريميرون,mirtazapine,30 mg,tablet,10 tablets,Organon,psychiatric,atypical antidepressant,depression,no,no,high,https://dwaprices.com/ause.php?id=50
+Mirtimash,ميرتيماش,mirtazapine,30 mg,tablet,30 tablets,,psychiatric,atypical antidepressant,depression,no,no,high,https://dwaprices.com/ause.php?id=50
+Trittico,تريتيكو,trazodone,50 mg,tablet,20 tablets,,psychiatric,atypical antidepressant,depression and insomnia,no,no,high,https://dwaprices.com/ause.php?id=50
+Trittico,تريتيكو,trazodone,100 mg,tablet,20 tablets,,psychiatric,atypical antidepressant,depression and insomnia,no,no,high,https://dwaprices.com/ause.php?id=50
+Agovald,اجوفالد,agomelatine,25 mg,film-coated tablet,21 tablets,,psychiatric,melatonergic antidepressant,depression,no,no,high,https://dwaprices.com/ause.php?id=50
+Valdoxan,فالدوكسان,agomelatine,25 mg,film-coated tablet,28 tablets,Servier,psychiatric,melatonergic antidepressant,depression,no,no,medium,
+Haldol,هالدول,haloperidol,5 mg,tablet,,Janssen,psychiatric,typical antipsychotic,schizophrenia and severe agitation,no,no,high,https://dwaprices.com/ause.php?id=16
+Halonace,هالوناس,haloperidol,5 mg,tablet,10 tablets,,psychiatric,typical antipsychotic,schizophrenia and severe agitation,no,no,high,https://dwaprices.com/ause.php?id=16
+Haldol Decanoate,هالدول ديكانوات,haloperidol decanoate,50 mg/mL,injection,1 ampoule,Janssen,psychiatric,typical antipsychotic (long-acting),schizophrenia maintenance,no,no,high,https://dwaprices.com/ause.php?id=16
+Zyprexa,زيبريكسا,olanzapine,5 mg,film-coated tablet,28 tablets,Eli Lilly,psychiatric,atypical antipsychotic,schizophrenia and bipolar disorder,no,no,high,https://dwaprices.com/med.php?id=12960
+Zyprexa,زيبريكسا,olanzapine,10 mg,film-coated tablet,28 tablets,Eli Lilly,psychiatric,atypical antipsychotic,schizophrenia and bipolar disorder,no,no,high,https://dwaprices.com/med.php?id=12959
+Zyprexa Velotab,زيبريكسا فيلوتاب,olanzapine,10 mg,orally disintegrating tablet,28 tablets,Eli Lilly,psychiatric,atypical antipsychotic,schizophrenia and bipolar disorder,no,no,high,https://dwaprices.com/med.php?id=12958
+Olapex,اولابكس,olanzapine,5 mg,film-coated tablet,30 tablets,,psychiatric,atypical antipsychotic,schizophrenia and bipolar disorder,no,no,high,https://dwaprices.com/ause.php?id=16
+Olapex,اولابكس,olanzapine,10 mg,film-coated tablet,30 tablets,,psychiatric,atypical antipsychotic,schizophrenia and bipolar disorder,no,no,high,https://dwaprices.com/ause.php?id=16
+Risperdal,ريسبيردال,risperidone,2 mg,film-coated tablet,20 tablets,Janssen,psychiatric,atypical antipsychotic,schizophrenia and mood disorders,no,no,high,https://dwaprices.com/med.php?id=9899
+Risperdal,ريسبيردال,risperidone,4 mg,tablet,20 tablets,Janssen,psychiatric,atypical antipsychotic,schizophrenia and mood disorders,no,no,high,https://dwaprices.com/med.php?id=9902
+Risperdal Consta,ريسبيردال كونستا,risperidone,25 mg,injection,1 vial,Janssen,psychiatric,atypical antipsychotic (long-acting),schizophrenia maintenance,yes,no,high,https://dwaprices.com/med.php?id=26182
+Risperdal Consta,ريسبيردال كونستا,risperidone,37.5 mg,injection,1 vial,Janssen,psychiatric,atypical antipsychotic (long-acting),schizophrenia maintenance,yes,no,high,https://dwaprices.com/med.php?id=26182
+Risdal,ريسدال,risperidone,1 mg/mL,oral solution,30 mL,,psychiatric,atypical antipsychotic,schizophrenia and mood disorders,no,no,high,https://dwaprices.com/med.php?id=26162
+Seroquel,سيروكويل,quetiapine,25 mg,tablet,10 tablets,AstraZeneca,psychiatric,atypical antipsychotic,schizophrenia and bipolar disorder,no,no,high,https://dwaprices.com/med.php?id=10363
+Seroquel,سيروكويل,quetiapine,100 mg,tablet,10 tablets,AstraZeneca,psychiatric,atypical antipsychotic,schizophrenia and bipolar disorder,no,no,high,https://dwaprices.com/med.php?id=10359
+Seroquel,سيروكويل,quetiapine,200 mg,tablet,30 tablets,AstraZeneca,psychiatric,atypical antipsychotic,schizophrenia and bipolar disorder,no,no,high,https://dwaprices.com/med.php?id=10361
+Quitapex,كيوتابكس,quetiapine,25 mg,film-coated tablet,30 tablets,,psychiatric,atypical antipsychotic,schizophrenia and bipolar disorder,no,no,high,https://dwaprices.com/ause.php?id=16
+Quitapex,كيوتابكس,quetiapine,100 mg,film-coated tablet,30 tablets,,psychiatric,atypical antipsychotic,schizophrenia and bipolar disorder,no,no,high,https://dwaprices.com/ause.php?id=16
+Quitapex,كيوتابكس,quetiapine,200 mg,film-coated tablet,30 tablets,,psychiatric,atypical antipsychotic,schizophrenia and bipolar disorder,no,no,high,https://dwaprices.com/ause.php?id=16
+Abilify,أبيليفاي,aripiprazole,5 mg,tablet,10 tablets,Otsuka,psychiatric,atypical antipsychotic,schizophrenia and bipolar disorder,no,no,high,https://dwaprices.com
+Abilify,أبيليفاي,aripiprazole,10 mg,tablet,28 tablets,Otsuka,psychiatric,atypical antipsychotic,schizophrenia and bipolar disorder,no,no,medium,
+Aripiprex,اريبيبركس,aripiprazole,10 mg,film-coated tablet,30 tablets,,psychiatric,atypical antipsychotic,schizophrenia and bipolar disorder,no,no,high,https://dwaprices.com/ause.php?id=16
+Aripiprex,اريبيبركس,aripiprazole,15 mg,film-coated tablet,20 tablets,,psychiatric,atypical antipsychotic,schizophrenia and bipolar disorder,no,no,high,https://dwaprices.com/med.php?id=32440
+Leponex,ليبونكس,clozapine,25 mg,tablet,50 tablets,Novartis,psychiatric,atypical antipsychotic,treatment-resistant schizophrenia,no,no,high,https://dwaprices.com/med.php?id=7201
+Leponex,ليبونكس,clozapine,100 mg,tablet,50 tablets,Novartis,psychiatric,atypical antipsychotic,treatment-resistant schizophrenia,no,no,high,https://dwaprices.com/med.php?id=21703
+Clozapex,كلوزابكس,clozapine,25 mg,tablet,50 tablets,,psychiatric,atypical antipsychotic,treatment-resistant schizophrenia,no,no,high,https://dwaprices.com/med.php?id=2822
+Clozapex,كلوزابكس,clozapine,100 mg,tablet,50 tablets,,psychiatric,atypical antipsychotic,treatment-resistant schizophrenia,no,no,high,https://dwaprices.com/med.php?id=2822
+Solian,سوليان,amisulpride,200 mg,tablet,30 tablets,Sanofi,psychiatric,atypical antipsychotic,schizophrenia,no,no,high,https://dwaprices.com/med.php?id=27245
+Amipride,اميبرايد,amisulpride,50 mg,tablet,30 tablets,,psychiatric,atypical antipsychotic,schizophrenia,no,no,high,https://dwaprices.com/med.php?id=1805
+Amipride,اميبرايد,amisulpride,200 mg,tablet,20 tablets,,psychiatric,atypical antipsychotic,schizophrenia,no,no,high,https://dwaprices.com/med.php?id=13947
+Amipride,اميبرايد,amisulpride,400 mg,film-coated tablet,20 tablets,,psychiatric,atypical antipsychotic,schizophrenia,no,no,high,https://dwaprices.com
+Fluanxol Depot,فلوانكسول ديبو,flupentixol decanoate,40 mg/2 mL,injection,10 ampoules,Lundbeck,psychiatric,typical antipsychotic (long-acting),schizophrenia maintenance,no,no,high,https://dwaprices.com/med.php?id=19186
+Dogmatil,دوجماتيل,sulpiride,50 mg,capsule,30 capsules,Sanofi,psychiatric,antipsychotic / gastric prokinetic,psychosis and low mood,no,no,high,https://dwaprices.com/med.php?id=17757
+Dogmatil Fort,دوجماتيل فورت,sulpiride,200 mg,tablet,10 tablets,Sanofi,psychiatric,antipsychotic / gastric prokinetic,psychosis and low mood,no,no,high,https://dwaprices.com/med.php?id=3775
+Prianil C.R.,بريانيل سي.ار,lithium carbonate,400 mg,extended-release tablet,30 tablets,El Nile,psychiatric,mood stabilizer,bipolar disorder,no,no,high,https://dwaprices.com/med.php?id=25225
+Depakine,ديباكين,valproate,200 mg,tablet,40 tablets,Sanofi,neurology,antiepileptic,epilepsy and bipolar disorder,no,no,high,https://dwaprices.com/aorder.php?id=3414
+Depakine Chrono,ديباكين كرونو,valproate,500 mg,extended-release tablet,30 tablets,Sanofi,neurology,antiepileptic,epilepsy and bipolar disorder,no,no,high,https://dwaprices.com/med.php?id=3416
+Depakine,ديباكين,valproate,200 mg/mL,oral solution,40 mL,Sanofi,neurology,antiepileptic,epilepsy and bipolar disorder,no,no,high,https://dwaprices.com/med.php?id=17261
+Tegretol,تجريتول,carbamazepine,200 mg,tablet,30 tablets,Novartis,neurology,antiepileptic,epilepsy and nerve pain,no,no,high,https://dwaprices.com/med.php?id=11234
+Tegretol CR,تجريتول سي ار,carbamazepine,200 mg,extended-release tablet,20 tablets,Novartis,neurology,antiepileptic,epilepsy and nerve pain,no,no,high,https://dwaprices.com/med.php?id=11237
+Tegretol CR,تجريتول سي ار,carbamazepine,400 mg,extended-release tablet,20 tablets,Novartis,neurology,antiepileptic,epilepsy and nerve pain,no,no,high,https://dwaprices.com/med.php?id=11236
+Lamictal,لاميكتال,lamotrigine,25 mg,tablet,30 tablets,GSK,neurology,antiepileptic,epilepsy and bipolar disorder,no,no,high,https://dwaprices.com/med.php?id=7074
+Lamictal,لاميكتال,lamotrigine,50 mg,tablet,30 tablets,GSK,neurology,antiepileptic,epilepsy and bipolar disorder,no,no,high,https://dwaprices.com/med.php?id=7075
+Lamictal,لاميكتال,lamotrigine,100 mg,tablet,30 tablets,GSK,neurology,antiepileptic,epilepsy and bipolar disorder,no,no,high,https://dwaprices.com/med.php?id=21560
+Xanax,زاناكس,alprazolam,0.5 mg,tablet,,Pfizer,psychiatric,benzodiazepine anxiolytic,anxiety,no,yes,medium,
+Prazolam,برازولام,alprazolam,0.25 mg,tablet,30 tablets,,psychiatric,benzodiazepine anxiolytic,anxiety,no,yes,high,https://dwaprices.com/med.php?id=25138
+Prazolam,برازولام,alprazolam,0.5 mg,tablet,30 tablets,,psychiatric,benzodiazepine anxiolytic,anxiety,no,yes,high,https://dwaprices.com/med.php?id=25139
+Zolam,زولام,alprazolam,0.5 mg,tablet,30 tablets,,psychiatric,benzodiazepine anxiolytic,anxiety,no,yes,medium,
+Rivotril,ريفوتريل,clonazepam,2 mg,tablet,,Roche,psychiatric,benzodiazepine anticonvulsant,anxiety and seizures,no,yes,medium,
+Klozepam,كلوزيبام,clonazepam,0.5 mg,tablet,20 tablets,,psychiatric,benzodiazepine anticonvulsant,anxiety and seizures,no,yes,high,https://dwaprices.com/med.php?id=21459
+Klozepam,كلوزيبام,clonazepam,2 mg,tablet,20 tablets,,psychiatric,benzodiazepine anticonvulsant,anxiety and seizures,no,yes,high,https://dwaprices.com/med.php?id=21460
+Valium,فاليوم,diazepam,5 mg,tablet,,Roche,psychiatric,benzodiazepine anxiolytic,anxiety and muscle spasm,no,yes,medium,
+Neuril,نيوريل,diazepam,10 mg/2 mL,injection,5 ampoules,,psychiatric,benzodiazepine anxiolytic,acute anxiety and seizures,no,yes,high,https://dwaprices.com/ause.php?id=42
+Lexotanil,ليكسوتانيل,bromazepam,3 mg,tablet,,Roche,psychiatric,benzodiazepine anxiolytic,anxiety,no,yes,medium,
+Stilnox,ستيلنوكس,zolpidem,10 mg,film-coated tablet,,Sanofi,psychiatric,non-benzodiazepine hypnotic,short-term insomnia,no,yes,medium,
+Ritalin,ريتالين,methylphenidate,10 mg,tablet,,Novartis,psychiatric,cns stimulant,adhd,no,yes,medium,
+Concerta,كونسيرتا,methylphenidate,18 mg,extended-release tablet,,Janssen,psychiatric,cns stimulant,adhd,no,yes,medium,
+Concerta,كونسيرتا,methylphenidate,36 mg,extended-release tablet,,Janssen,psychiatric,cns stimulant,adhd,no,yes,medium,
+Strattera,ستراتيرا,atomoxetine,25 mg,capsule,,Eli Lilly,psychiatric,non-stimulant adhd medication,adhd,no,no,medium,
+Keppra,كيبرا,levetiracetam,500 mg,film-coated tablet,30 tablets,UCB,neurology,antiepileptic,epilepsy,no,no,high,https://dwaprices.com/ause.php?id=42
+Keppra,كيبرا,levetiracetam,1000 mg,film-coated tablet,30 tablets,UCB,neurology,antiepileptic,epilepsy,no,no,medium,
+Tiratam,تيراتام,levetiracetam,500 mg,tablet,30 tablets,,neurology,antiepileptic,epilepsy,no,no,high,https://dwaprices.com/ause.php?id=42
+Tiratam,تيراتام,levetiracetam,1000 mg,tablet,20 tablets,,neurology,antiepileptic,epilepsy,no,no,high,https://dwaprices.com/ause.php?id=42
+Epanutin,ابانوتين,phenytoin,100 mg,capsule,50 capsules,Pfizer,neurology,antiepileptic,epilepsy,no,no,high,https://dwaprices.com/ause.php?id=42
+Topamax,توباماكس,topiramate,25 mg,tablet,60 tablets,Janssen,neurology,antiepileptic,epilepsy and migraine prevention,no,no,high,https://dwaprices.com/ause.php?id=42
+Topamax,توباماكس,topiramate,100 mg,tablet,60 tablets,Janssen,neurology,antiepileptic,epilepsy and migraine prevention,no,no,high,https://dwaprices.com/ause.php?id=42
+Trileptal,تريليبتال,oxcarbazepine,300 mg,tablet,50 tablets,Novartis,neurology,antiepileptic,epilepsy,no,no,high,https://dwaprices.com/ause.php?id=42
+Trileptal,تريليبتال,oxcarbazepine,600 mg,tablet,50 tablets,Novartis,neurology,antiepileptic,epilepsy,no,no,high,https://dwaprices.com/ause.php?id=42
+Neurontin,نيورونتين,gabapentin,300 mg,capsule,20 capsules,Pfizer,neurology,antiepileptic / nerve pain agent,epilepsy and nerve pain,no,no,high,https://dwaprices.com/ause.php?id=42
+Gabalepsy,جابالبسي,gabapentin,300 mg,capsule,30 capsules,,neurology,antiepileptic / nerve pain agent,epilepsy and nerve pain,no,no,high,https://dwaprices.com/ause.php?id=42
+Lyrica,ليريكا,pregabalin,75 mg,capsule,20 capsules,Pfizer,neurology,antiepileptic / nerve pain agent,nerve pain and epilepsy,no,yes,high,https://dwaprices.com/ause.php?id=42
+Lyrica,ليريكا,pregabalin,150 mg,capsule,20 capsules,Pfizer,neurology,antiepileptic / nerve pain agent,nerve pain and epilepsy,no,yes,high,https://dwaprices.com/ause.php?id=42
+Parkinol,باركينول,trihexyphenidyl,2 mg,tablet,,,neurology,anticholinergic,drug-induced tremor and stiffness,no,yes,medium,
+Akineton,اكينيتون,biperiden,2 mg,tablet,,Abbott,neurology,anticholinergic,drug-induced tremor and stiffness,no,yes,medium,
+Sinemet,سينيميت,levodopa;carbidopa,250/25 mg,tablet,,Organon,neurology,antiparkinsonian,parkinson's disease,no,no,medium,
+Aricept,اريسبت,donepezil,10 mg,film-coated tablet,,Eisai,neurology,cholinesterase inhibitor,alzheimer's dementia,no,no,medium,
+Ebixa,ايبيكسا,memantine,10 mg,film-coated tablet,,Lundbeck,neurology,nmda receptor antagonist,alzheimer's dementia,no,no,medium,
+Imigran,ايميجران,sumatriptan,50 mg,tablet,2 tablets,GSK,neurology,triptan,acute migraine,no,no,high,https://dwaprices.com/ause.php?id=30
+Betaserc,بيتاسيرك,betahistine,24 mg,tablet,,Abbott,neurology,antivertigo agent,vertigo and dizziness,no,no,medium,
+Betaserc,بيتاسيرك,betahistine,16 mg,tablet,,Abbott,neurology,antivertigo agent,vertigo and dizziness,no,no,medium,
+Neurobion,نيوروبيون,thiamine;pyridoxine;cyanocobalamin,100/200/0.2 mg,film-coated tablet,20 tablets,Merck,neurology,vitamin b complex,nerve support and neuropathy,no,no,medium,
+Neurovit,نيوروفيت,thiamine;pyridoxine;cyanocobalamin,100/200/0.2 mg,tablet,30 tablets,,neurology,vitamin b complex,nerve support and neuropathy,no,no,medium,
+Stugeron,ستوجيرون,cinnarizine,25 mg,tablet,,Janssen,neurology,antihistamine / calcium channel blocker,vertigo and motion sickness,no,no,high,https://dwaprices.com/ause.php?id=53
+Nootropil,نوتروبيل,piracetam,1200 mg,tablet,,UCB,neurology,nootropic,memory and cognitive support,no,no,medium,
+Oxitropil,اوكسيتروبيل,piracetam,1200 mg,tablet,60 tablets,,neurology,nootropic,memory and cognitive support,no,no,high,https://dwaprices.com/ause.php?id=53
+Egyram,ايجرام,piracetam,800 mg,tablet,,,neurology,nootropic,memory and cognitive support,no,no,high,https://dwaprices.com/ause.php?id=53

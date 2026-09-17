@@ -1,0 +1,87 @@
+brand_en,brand_ar,ingredients,strength,form,pack_size,manufacturer,categories,drug_class,use_en,fridge,controlled,confidence,source
+Betnovate,بيتنوفيت,betamethasone,0.1%,cream,15 g,GSK,dermatology;corticosteroid,topical corticosteroid,eczema and skin inflammation,no,no,high,https://dwaprices.com/med.php?id=1474
+Betnovate-N,بيتنوفيت إن,betamethasone;neomycin,0.1%/0.5%,cream,30 g,GSK,dermatology;corticosteroid;antibiotic,corticosteroid + antibiotic,infected eczema,no,no,high,https://en.egyptdwa.com/m/2488
+Betnovate-C,بيتنوفيت سي,betamethasone;clioquinol,0.1%/3%,cream,15 g,GSK,dermatology;corticosteroid;antifungal,corticosteroid + antiseptic,infected eczema,no,no,high,https://dwaprices.com/med.php?id=1478
+Diprosone,ديبروزون,betamethasone,0.05%,cream,30 g,MSD,dermatology;corticosteroid,potent topical corticosteroid,eczema and psoriasis,no,no,high,https://russkaya-apteka.com/en/products/diprozon-krem-005-30-g
+Diprosone,ديبروزون,betamethasone,0.05%,ointment,10 g,MSD,dermatology;corticosteroid,potent topical corticosteroid,eczema and psoriasis,no,no,high,https://www.bloompharmacy.com/collections/corticosteroids
+Diprosalic,ديبروساليك,betamethasone;salicylic acid,0.05%/3%,ointment,15 g,MSD,dermatology;corticosteroid,corticosteroid + keratolytic,psoriasis and thick scaly skin,no,no,high,https://egyptiandrugstore.com/index.php?product_id=3731&route=product%2Fproduct
+Diprosalic,ديبروساليك,betamethasone;salicylic acid,0.05%/2%,lotion,30 mL,MSD,dermatology;corticosteroid,corticosteroid + keratolytic,scalp psoriasis,no,no,high,https://dwaprices.com/med.php?id=3733
+Dermovate,درموفيت,clobetasol,0.05%,cream,25 g,GSK,dermatology;corticosteroid,potent topical corticosteroid,severe eczema and psoriasis,no,no,high,https://dwaprices.com/med.php?id=3502
+Dermovate,درموفيت,clobetasol,0.05%,ointment,25 g,GSK,dermatology;corticosteroid,potent topical corticosteroid,severe eczema and psoriasis,no,no,high,https://tdawi.com/en_eg/catalogsearch/result/?q=clobetasol
+Clerovate,كليروفات,clobetasol,0.05%,cream,25 g,,dermatology;corticosteroid,potent topical corticosteroid,severe eczema and psoriasis,no,no,high,https://dwaprices.com/med.php?id=2749
+Clovacort,كلوفاكورت,clobetasol,0.05%,ointment,20 g,,dermatology;corticosteroid,potent topical corticosteroid,severe eczema and psoriasis,no,no,high,https://dwaprices.com/med.php?id=2721
+Texacort,تكساكورت,hydrocortisone,0.1%,cream,20 g,,dermatology;corticosteroid,mild topical corticosteroid,mild eczema and itching,no,no,high,https://www.bloompharmacy.com/collections/corticosteroids
+Betaderm,بيتاديرم,betamethasone,0.1%,cream,15 g,,dermatology;corticosteroid,topical corticosteroid,eczema and skin inflammation,no,no,high,https://www.bloompharmacy.com/collections/corticosteroids
+Betaderm,بيتاديرم,betamethasone,0.1%,ointment,15 g,,dermatology;corticosteroid,topical corticosteroid,eczema and skin inflammation,no,no,high,https://www.bloompharmacy.com/collections/corticosteroids
+Mixderm,ميكسديرم,betamethasone,0.1%,cream,30 g,,dermatology;corticosteroid,topical corticosteroid,eczema and skin inflammation,no,no,medium,
+Kerella,كيريلا,betamethasone,0.1%,lotion,30 mL,,dermatology;corticosteroid,topical corticosteroid,scalp eczema and dermatitis,no,no,medium,
+Kerella,كيريلا,betamethasone,0.1%,ointment,15 g,,dermatology;corticosteroid,topical corticosteroid,eczema and skin inflammation,no,no,medium,
+Borgasone,بورجازون,mometasone,0.1%,cream,20 g,,dermatology;corticosteroid,potent topical corticosteroid,eczema and psoriasis,no,no,high,https://tdawi.com/en_eg/catalogsearch/result/?q=mometasone
+Borgasone,بورجازون,mometasone,0.1%,ointment,20 g,,dermatology;corticosteroid,potent topical corticosteroid,eczema and psoriasis,no,no,high,https://tdawi.com/en_eg/catalogsearch/result/?q=mometasone
+Elica,إيليكا,mometasone,0.1%,cream,15 g,,dermatology;corticosteroid,potent topical corticosteroid,eczema and psoriasis,no,no,high,https://gardeniapharmacies.com/en/?s=elica
+Salibet,ساليبيت,betamethasone;salicylic acid,0.05%/3%,ointment,30 g,Jamjoom Pharma,dermatology;corticosteroid,corticosteroid + keratolytic,psoriasis and thick scaly skin,no,no,medium,
+Daivobet,دايفوبيت,calcipotriol;betamethasone,50 mcg/0.5 mg/g,ointment,30 g,Leo Pharma,dermatology;corticosteroid,vitamin D analog + corticosteroid,psoriasis,no,no,high,https://gardeniapharmacies.com/en/?s=daivobet
+Diacalderm,دياكالديرم,calcipotriol;betamethasone,50 mcg/0.5 mg/g,ointment,20 g,,dermatology;corticosteroid,vitamin D analog + corticosteroid,psoriasis,no,no,medium,
+Calcipoheal Cort,كالسيبوهيل كورت,calcipotriol;betamethasone,50 mcg/0.5 mg/g,ointment,15 g,,dermatology;corticosteroid,vitamin D analog + corticosteroid,psoriasis,no,no,medium,
+Cutivate,كيوتيفيت,fluticasone,0.05%,cream,15 g,GSK,dermatology;corticosteroid,topical corticosteroid,eczema and dermatitis,no,no,high,https://gardeniapharmacies.com/en/?s=cutivate
+Cutivate,كيوتيفيت,fluticasone,0.005%,ointment,15 g,GSK,dermatology;corticosteroid,topical corticosteroid,eczema and dermatitis,no,no,high,https://gardeniapharmacies.com/en/?s=cutivate
+Fucicort,فيوسيكورت,betamethasone;fusidic acid,0.1%/2%,cream,15 g,LEO Pharma,dermatology;corticosteroid;antibiotic,corticosteroid + antibiotic,infected eczema,no,no,high,https://egyptiandrugstore.com/index.php?route=product%2Fproduct&product_id=2057
+Fusi Zon,فيوزي زون,betamethasone;fusidic acid,0.1%/2%,cream,15 g,,dermatology;corticosteroid;antibiotic,corticosteroid + antibiotic,infected eczema,no,no,medium,
+Kenacomb,كيناكومب,triamcinolone;neomycin;gramicidin;nystatin,0.1%/0.25%/0.025%/100000 U/g,cream,15 g,,dermatology;corticosteroid;antifungal,corticosteroid + antibiotic + antifungal,infected fungal skin inflammation,no,no,medium,
+Kenacomb,كيناكومب,triamcinolone;neomycin;gramicidin;nystatin,0.1%/0.25%/0.025%/100000 U/g,ointment,15 g,,dermatology;corticosteroid;antifungal,corticosteroid + antibiotic + antifungal,infected fungal skin inflammation,no,no,medium,
+Quadriderm,كوادريديرم,betamethasone;gentamicin;tolnaftate;clioquinol,0.05%/0.1%/1%/1%,cream,30 g,Memphis,dermatology;corticosteroid;antifungal,corticosteroid + antibiotic + antifungal,infected fungal skin conditions,no,no,high,https://gardeniapharmacies.com/en/product/quadriderm-cream/?lang=en
+Momenta,مومينتا,mometasone;miconazole;gentamicin,0.1%/3%/0.1%,cream,30 g,Jamjoom,dermatology;corticosteroid;antifungal,corticosteroid + antifungal + antibiotic,infected fungal eczema,no,no,high,https://tdawi.com/en_eg/momenta-cream-30gm
+Elica-M,إيليكا إم,mometasone;miconazole,0.1%/2%,cream,15 g,,dermatology;corticosteroid;antifungal,corticosteroid + antifungal,fungal skin infection with inflammation,no,no,high,https://gardeniapharmacies.com/en/?s=elica
+Candicure,كانديكيور,isoconazole;diflucortolone,1%/0.1%,cream,15 g,,dermatology;corticosteroid;antifungal,corticosteroid + antifungal,fungal skin infection with inflammation,no,no,high,https://gardeniapharmacies.com/en/?s=isoconazole
+Cutacort,كوتاكورت,isoconazole;diflucortolone,1%/0.1%,cream,15 g,,dermatology;corticosteroid;antifungal,corticosteroid + antifungal,fungal skin infection with inflammation,no,no,high,https://gardeniapharmacies.com/en/?s=isoconazole
+Travodermal,ترافوديرمال,isoconazole;diflucortolone,1%/0.1%,cream,15 g,,dermatology;corticosteroid;antifungal,corticosteroid + antifungal,fungal skin infection with inflammation,no,no,medium,
+Pevisone,بيفيزون,econazole;triamcinolone,1%/0.1%,cream,15 g,Novartis,dermatology;corticosteroid;antifungal,corticosteroid + antifungal,fungal skin infection with inflammation,no,no,medium,
+Daktarin,داكتارين,miconazole,2%,cream,15 g,Janssen,dermatology;antifungal,imidazole antifungal,fungal skin infection,no,no,high,http://egyptiandrugstore.com/index.php?route=product/product&product_id=3711
+Miconaz,ميكوناز,miconazole,2%,cream,20 g,,dermatology;antifungal,imidazole antifungal,fungal skin infection,no,no,high,https://tdawi.com/en_eg/catalogsearch/result/?q=miconazole
+Canesten,كانستين,clotrimazole,1%,cream,20 g,Bayer,dermatology;antifungal,imidazole antifungal,fungal skin infection,no,no,high,http://egyptiandrugstore.com/index.php?route=product/product&product_id=503
+Candistan,كانديستان,clotrimazole,1%,cream,40 g,,dermatology;antifungal,imidazole antifungal,fungal skin infection,no,no,high,https://tdawi.com/en_eg/catalogsearch/result/?q=clotrimazole
+Dermatin,ديرماتين,clotrimazole,1%,cream,,,dermatology;antifungal,imidazole antifungal,fungal skin infection,no,no,high,https://tdawi.com/en_eg/catalogsearch/result/?q=clotrimazole
+Lamisil,لاميزيل,terbinafine,1%,cream,15 g,Novartis,dermatology;antifungal,allylamine antifungal,athlete's foot and fungal skin infection,no,no,high,https://tdawi.com/en_eg/lamisil-1-cream-15-gm
+Terbin,تيربين,terbinafine,1%,cream,15 g,,dermatology;antifungal,allylamine antifungal,fungal skin infection,no,no,high,https://tdawi.com/en_eg/catalogsearch/result/?q=terbinafine
+Lamifen,لاميفين,terbinafine,1%,cream,15 g,,dermatology;antifungal,allylamine antifungal,fungal skin infection,no,no,high,https://tdawi.com/en_eg/catalogsearch/result/?q=terbinafine
+Dermofix,ديرموفيكس,sertaconazole,2%,cream,15 g,Actoverco,dermatology;antifungal,imidazole antifungal,fungal skin infection,no,no,high,http://egyptiandrugstore.com/index.php?route=product%2Fproduct&product_id=3720
+Biosertazol,بيوسيرتازول,sertaconazole,2%,cream,30 g,,dermatology;antifungal,imidazole antifungal,fungal skin infection,no,no,high,https://tdawi.com/en_eg/catalogsearch/result/?q=sertaconazole
+Nizoral,نيزورال,ketoconazole,2%,shampoo,60 mL,Janssen,dermatology;antifungal,imidazole antifungal,dandruff and scalp fungal infection,no,no,high,http://egyptiandrugstore.com/index.php?route=product%2Fproduct&product_id=650
+Fucidin,فيوسيدين,fusidic acid,2%,cream,15 g,LEO Pharma,dermatology;antibiotic,topical antibiotic,bacterial skin infection,no,no,high,https://tdawi.com/en_eg/catalogsearch/result/?q=fusidic
+Fusiderm,فيوسيديرم,fusidic acid,2%,cream,15 g,,dermatology;antibiotic,topical antibiotic,bacterial skin infection,no,no,high,https://gardeniapharmacies.com/en/?s=fusiderm
+Fusi,فيوزي,fusidic acid,2%,ointment,15 g,,dermatology;antibiotic,topical antibiotic,bacterial skin infection,no,no,high,https://tdawi.com/en_eg/catalogsearch/result/?q=fusidic
+Mupirax,ميوبيراكس,mupirocin,2%,ointment,10 g,,dermatology;antibiotic,topical antibiotic,bacterial skin infection e.g. impetigo,no,no,high,https://tdawi.com/en_eg/catalogsearch/result/?q=mupirocin
+Garamycin,جاراميسين,gentamicin,0.1%,cream,15 g,,dermatology;antibiotic,aminoglycoside antibiotic,bacterial skin infection,no,no,high,https://tdawi.com/en_eg/catalogsearch/result/?q=garamycin
+Garamycin,جاراميسين,gentamicin,0.1%,ointment,15 g,,dermatology;antibiotic,aminoglycoside antibiotic,bacterial skin infection,no,no,high,https://tdawi.com/en_eg/catalogsearch/result/?q=garamycin
+Dermazin,ديرمازين,silver sulfadiazine,1%,cream,50 g,SEDICO,dermatology;antibiotic,topical antibacterial,burns and wound care,no,no,medium,
+Zovirax,زوفيراكس,acyclovir,5%,cream,10 g,GSK,dermatology;antiviral,antiviral,cold sores and herpes skin infection,no,no,high,http://egyptiandrugstore.com/index.php?route=product/product&product_id=5101
+Differin,ديفرين,adapalene,0.1%,gel,15 g,Galderma,dermatology,retinoid,acne treatment,no,no,high,https://tdawi.com/en_eg/differin-adapalene-0-1-gel-acne-treatment-0-5-oz-15-g
+Acretin,أكريتين,tretinoin,0.025%,cream,30 g,,dermatology,retinoid,acne treatment,no,no,high,https://tdawi.com/en_eg/catalogsearch/result/?q=tretinoin
+Acretin,أكريتين,tretinoin,0.05%,cream,30 g,,dermatology,retinoid,acne treatment,no,no,high,https://tdawi.com/en_eg/catalogsearch/result/?q=tretinoin
+Marpalene,ماربالين,adapalene,0.1%,cream,30 g,,dermatology,retinoid,acne treatment,no,no,medium,
+Benxop,بينزوب,benzoyl peroxide,2.5%,cream,20 g,SALVE,dermatology,keratolytic antibacterial,acne treatment,no,no,medium,
+Roaccutane,روأكيوتين,isotretinoin,20 mg,capsule,30 capsules,Roche,dermatology,retinoid,severe acne treatment,no,no,high,https://en.egyptdwa.com/m/1334
+Isotretam,إيزوتريتام,isotretinoin,20 mg,capsule,10 capsules,,dermatology,retinoid,severe acne treatment,no,no,medium,
+Oratane,أوراتان,isotretinoin,20 mg,capsule,,,dermatology,retinoid,severe acne treatment,no,no,medium,
+Oratane,أوراتان,isotretinoin,10 mg,capsule,,,dermatology,retinoid,severe acne treatment,no,no,medium,
+Curacne,كيوراكن,isotretinoin,10 mg,capsule,,,dermatology,retinoid,severe acne treatment,no,no,medium,
+Curacne,كيوراكن,isotretinoin,20 mg,capsule,,,dermatology,retinoid,severe acne treatment,no,no,medium,
+Curacne,كيوراكن,isotretinoin,40 mg,capsule,,,dermatology,retinoid,severe acne treatment,no,no,medium,
+Xeractan,زيراكتان,isotretinoin,10 mg,capsule,,,dermatology,retinoid,severe acne treatment,no,no,medium,
+Xeractan,زيراكتان,isotretinoin,20 mg,capsule,,,dermatology,retinoid,severe acne treatment,no,no,medium,
+Ruatine,رواتين,isotretinoin,20 mg,capsule,,,dermatology,retinoid,severe acne treatment,no,no,medium,
+Netlook,نيتلوك,isotretinoin,20 mg,capsule,20 capsules,,dermatology,retinoid,severe acne treatment,no,no,medium,
+Topimethrin,توبيميثرين,permethrin,5%,lotion,50 mL,,dermatology;antiparasitic,scabicide,scabies and lice treatment,no,no,high,https://gardeniapharmacies.com/en/?s=permethrin
+Ectomethrin,إكتوميثرين,permethrin,5%,lotion,,,dermatology;antiparasitic,scabicide,scabies and lice treatment,no,no,medium,
+MEBO,ميبو,beta-sitosterol,0.25%,ointment,30 g,,dermatology,herbal wound healing ointment,burns and wound healing,no,no,high,https://tdawi.com/en_eg/catalogsearch/result/?q=mebo
+Bepanthen,بيبانثين,dexpanthenol,5%,ointment,30 g,Bayer,dermatology,vitamin B5 analog,nappy rash and wound healing,no,no,high,https://tdawi.com/en_eg/catalogsearch/result/?q=bepanthen
+Fenistil,فينيستيل,dimethindene,0.1%,gel,20 g,Novartis,dermatology;allergy,antihistamine,itching and insect bites,no,no,high,https://dwaprices.com/med.php?id=4789
+Meloquin,ميلوكوين,hydroquinone,4%,cream,20 g,,dermatology,skin bleaching agent,hyperpigmentation and melasma,no,no,high,https://gardeniapharmacies.com/en/product/meloquin-cream/?lang=en
+Clearaliqe,كليراليك,hydroquinone,2%,cream,,,dermatology,skin bleaching agent,hyperpigmentation and melasma,no,no,high,https://gardeniapharmacies.com/en/?s=hydroquinone
+Clearaliqe Forte,كليراليك فورت,hydroquinone,4%,cream,,,dermatology,skin bleaching agent,hyperpigmentation and melasma,no,no,high,https://gardeniapharmacies.com/en/?s=hydroquinone
+Hairgrow,هيرجرو,minoxidil,5%,topical solution,50 mL,Dar Al Dawa,dermatology,hair growth stimulant,hair loss treatment,no,no,medium,
+Aknemycin,أكني ميسين,erythromycin,2%,ointment,,,dermatology,macrolide antibiotic,acne treatment,no,no,high,https://gardeniapharmacies.com/en/?s=erythromycin
+Clinda Sol,كليندا سول,clindamycin,1%,topical solution,30 mL,,dermatology,lincosamide antibiotic,acne treatment,no,no,high,https://gardeniapharmacies.com/en/?s=clindamycin
+Zakan,زاكان,ketoconazole,2%,cream,,,dermatology;antifungal,imidazole antifungal,fungal skin infection,no,no,high,https://gardeniapharmacies.com/en/?s=ketoconazole
+Batrafen,باترافين,ciclopirox,1%,cream,,,dermatology;antifungal,antifungal,fungal skin infection,no,no,high,https://gardeniapharmacies.com/en/?s=ciclopirox
+Nystaform,نيستافورم,nystatin;clioquinol;hydrocortisone,1%/3%/1%,ointment,,,dermatology;antifungal;corticosteroid,antifungal + antiseptic + corticosteroid,fungal skin infection with inflammation,no,no,high,https://gardeniapharmacies.com/en/?s=nystaform

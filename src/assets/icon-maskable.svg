@@ -1,0 +1,21 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#101216"/>
+      <stop offset="100%" stop-color="#0a0b0d"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg)"/>
+
+  <!-- Same raven mark as icon-source.svg, scaled ~68% and centered for the maskable safe zone -->
+  <g transform="translate(256 256) scale(0.68) translate(-245 -258)">
+    <g fill="#9a9d78">
+      <path d="M 150 175 L 128 118 L 178 152 L 162 100 L 205 140 L 196 108 L 232 145 Z"/>
+      <circle cx="245" cy="270" r="118"/>
+      <path d="M 335 240 L 462 268 L 335 306 L 358 268 Z"/>
+      <path d="M 210 372 L 196 432 L 232 366 L 236 424 L 262 364 L 278 416 L 292 360 L 312 400 L 316 352 Z"/>
+    </g>
+    <circle cx="272" cy="238" r="13" fill="#0a0b0d"/>
+    <circle cx="275" cy="235" r="6" fill="#b3402f"/>
+  </g>
+</svg>

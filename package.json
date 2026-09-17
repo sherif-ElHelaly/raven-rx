@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "npm run seed:sync && vite",
     "build": "npm run seed:sync && tsc -b && vite build",
-    "seed:sync": "node -e \"require('fs').copyFileSync('seed/medications.csv','public/seed/medications.csv')\"",
+    "seed:sync": "node -e \"const fs=require('fs');fs.mkdirSync('public/seed',{recursive:true});fs.copyFileSync('seed/medications.csv','public/seed/medications.csv')\"",
     "seed:expand": "node seed/expand_seed.mjs",
     "lint": "oxlint",
     "preview": "vite preview",

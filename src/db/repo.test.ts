@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { SarfDB } from './schema'
 import {
   addItem,
@@ -17,17 +17,12 @@ import {
   lastFoundWhere,
   markLineFound,
   mostUsedLocations,
-  moneyOwed,
   nextDueDate,
   nextStatus,
-  openItemsSummary,
-  requestIsComplete,
-  setFeeRefunded,
   setItemStatus,
   setProductIngredients,
   setRegularMeds,
   shoppingList,
-  staleItems,
   upsertIngredientByName,
 } from './repo'
 import { parseSeedCsv } from './seedImport'
@@ -214,90 +209,6 @@ describe('setItemStatus', () => {
     expect(item!.status).toBe('delivered')
     expect(item!.deliveredAt).toBeDefined()
     expect(item!.statusHistory).toHaveLength(3)
-  })
-})
-
-describe('requestIsComplete', () => {
-  it('is false while any item is still open', async () => {
-    const person = await findOrCreatePerson(db, '444')
-    const productId = await createProduct(
-      db,
-      { nameEn: 'Tareg', nameAr: 'تارج', categories: ['cardiac'], verified: true },
-      ['valsartan'],
-    )
-    const presentationId = await addPresentation(db, {
-      productId,
-      strength: '80 mg',
-      form: 'tablet',
-      fridge: false,
-      controlled: false,
-    })
-    const requestId = await createRequest(db, person.id!, 'monthly')
-    const itemId = await addItem(db, requestId, presentationId, 1)
-    expect(await requestIsComplete(db, requestId)).toBe(false)
-
-    await setItemStatus(db, itemId, 'found')
-    await setItemStatus(db, itemId, 'delivered')
-    // delivered but fee not yet refunded
-    expect(await requestIsComplete(db, requestId)).toBe(false)
-
-    await setFeeRefunded(db, itemId, true)
-    expect(await requestIsComplete(db, requestId)).toBe(true)
-  })
-
-  it('allows partial delivery: cancelled items do not need a refund', async () => {
-    const person = await findOrCreatePerson(db, '555')
-    const productId = await createProduct(
-      db,
-      { nameEn: 'Tareg', nameAr: 'تارج', categories: ['cardiac'], verified: true },
-      ['valsartan'],
-    )
-    const presentationId = await addPresentation(db, {
-      productId,
-      strength: '80 mg',
-      form: 'tablet',
-      fridge: false,
-      controlled: false,
-    })
-    const requestId = await createRequest(db, person.id!, 'monthly')
-    const item1 = await addItem(db, requestId, presentationId, 1)
-    const item2 = await addItem(db, requestId, presentationId, 1)
-
-    await setItemStatus(db, item1, 'found')
-    await setItemStatus(db, item1, 'delivered')
-    await setFeeRefunded(db, item1, true)
-    await setItemStatus(db, item2, 'unavailable')
-
-    expect(await requestIsComplete(db, requestId)).toBe(true)
-  })
-})
-
-describe('moneyOwed', () => {
-  it('sums fees for delivered-but-not-refunded items only', async () => {
-    const person = await findOrCreatePerson(db, '666')
-    const productId = await createProduct(
-      db,
-      { nameEn: 'Tareg', nameAr: 'تارج', categories: ['cardiac'], verified: true },
-      ['valsartan'],
-    )
-    const presentationId = await addPresentation(db, {
-      productId,
-      strength: '80 mg',
-      form: 'tablet',
-      fridge: false,
-      controlled: false,
-    })
-    const requestId = await createRequest(db, person.id!, 'bimonthly') // 10 EGP/item
-    const item1 = await addItem(db, requestId, presentationId, 1)
-    const item2 = await addItem(db, requestId, presentationId, 1)
-
-    await setItemStatus(db, item1, 'found')
-    await setItemStatus(db, item1, 'delivered')
-    await setItemStatus(db, item2, 'found')
-    await setItemStatus(db, item2, 'delivered')
-    await setFeeRefunded(db, item2, true)
-
-    expect(await moneyOwed(db)).toBe(10) // only item1 still owed
   })
 })
 
@@ -495,34 +406,6 @@ describe('mostUsedLocations', () => {
   })
 })
 
-describe('openItemsSummary', () => {
-  it('counts items by open status only', async () => {
-    const person = await findOrCreatePerson(db, '901')
-    const productId = await createProduct(
-      db,
-      { nameEn: 'X', nameAr: 'س', categories: ['gastric'], verified: true },
-      ['x'],
-    )
-    const presentationId = await addPresentation(db, {
-      productId,
-      strength: '1 mg',
-      form: 'tablet',
-      fridge: false,
-      controlled: false,
-    })
-    const requestId = await createRequest(db, person.id!, 'monthly')
-    const item1 = await addItem(db, requestId, presentationId, 1)
-    const item2 = await addItem(db, requestId, presentationId, 1)
-    const item3 = await addItem(db, requestId, presentationId, 1)
-    await setItemStatus(db, item2, 'found')
-    await setItemStatus(db, item3, 'found')
-    await setItemStatus(db, item3, 'delivered')
-    void item1
-
-    expect(await openItemsSummary(db)).toEqual({ searching: 1, found: 1, transferred: 0 })
-  })
-})
-
 describe('dueSoon', () => {
   it('lists persons whose nearest request falls within the window', async () => {
     const now = Date.now()
@@ -581,40 +464,6 @@ describe('dueSoon', () => {
     const due = await dueSoon(db, 5)
     expect(due).toHaveLength(1)
     expect(due[0]!.request.nextDueDate).toBe(now + 1 * 24 * 60 * 60 * 1000)
-  })
-})
-
-describe('staleItems', () => {
-  afterEach(() => vi.useRealTimers())
-
-  it('flags open items created more than N days ago', async () => {
-    vi.useFakeTimers({ toFake: ['Date'] })
-    vi.setSystemTime(new Date('2026-01-01T00:00:00Z'))
-
-    const person = await findOrCreatePerson(db, '905')
-    const productId = await createProduct(
-      db,
-      { nameEn: 'X', nameAr: 'س', categories: ['gastric'], verified: true },
-      ['x'],
-    )
-    const presentationId = await addPresentation(db, {
-      productId,
-      strength: '1 mg',
-      form: 'tablet',
-      fridge: false,
-      controlled: false,
-    })
-    const requestId = await createRequest(db, person.id!, 'monthly')
-    const oldItem = await addItem(db, requestId, presentationId, 1)
-
-    vi.setSystemTime(new Date('2026-01-03T00:00:00Z')) // 2 days later
-    const freshItem = await addItem(db, requestId, presentationId, 1)
-
-    vi.setSystemTime(new Date('2026-01-05T00:00:00Z')) // oldItem is now 4 days old
-
-    const stale = await staleItems(db, 3)
-    expect(stale.map((i) => i.id)).toEqual([oldItem])
-    void freshItem
   })
 })
 

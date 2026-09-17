@@ -1,12 +1,13 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { OPEN_STATUSES } from '../../db/repo'
+import { loadCases } from '../../db/cases'
 import { db } from '../../db/schema'
 import { normalizeText } from '../../search/normalize'
 import { search } from '../../search/searchIndex'
 import { useSearchIndex } from '../../search/useSearchIndex'
-import { maskCardNumber } from '../../ui/format'
+import { maskCardNumber, personTitle } from '../../ui/format'
+import { CaseRow } from './requests/CaseRow'
 import { STATUS_LABELS } from './requests/statusMeta'
 import './pages.css'
 import './requests/requests.css'
@@ -36,6 +37,7 @@ export function Search() {
     return people.filter(
       (p) =>
         (p.name && normalizeText(p.name).includes(norm)) ||
+        (p.rank && normalizeText(p.rank).includes(norm)) ||
         (digits.length > 0 && p.cardNumber.includes(digits)),
     )
   }, [active, people, trimmed])
@@ -52,18 +54,24 @@ export function Search() {
           return pres && productIds.has(pres.productId)
         })
 
-  const openItems = matchingItems.filter((i) => OPEN_STATUSES.includes(i.status))
-  const pastItems = matchingItems.filter((i) => !OPEN_STATUSES.includes(i.status))
-
-  const personById = new Map((people ?? []).map((p) => [p.id!, p]))
-  const requests = useLiveQuery(() => db.requests.toArray(), [])
-  const requestById = new Map((requests ?? []).map((r) => [r.id!, r]))
-
-  const itemLabel = (item: (typeof matchingItems)[number]) => {
-    const request = requestById.get(item.requestId)
-    const person = request ? personById.get(request.personId) : undefined
-    return person ? person.name || maskCardNumber(person.cardNumber) : '…'
+  // Matching meds are shown as their cases (one row per case), not one per med.
+  const cases = useLiveQuery(() => loadCases(db), [])
+  const matchedByRequest = new Map<number, typeof matchingItems>()
+  for (const item of matchingItems) {
+    matchedByRequest.set(item.requestId, [...(matchedByRequest.get(item.requestId) ?? []), item])
   }
+  const matchedCases = (cases ?? []).filter((c) => matchedByRequest.has(c.request.id!))
+  const activeCases = matchedCases.filter((c) => !c.finished)
+  const finishedCases = matchedCases.filter((c) => c.finished)
+
+  const matchDetail = (requestId: number) =>
+    (matchedByRequest.get(requestId) ?? [])
+      .map((i) => {
+        const pres = presentationById.get(i.presentationId)
+        const name = pres ? productById.get(pres.productId)?.nameEn : undefined
+        return `${name ?? 'Unknown'}: ${STATUS_LABELS[i.status].toLowerCase()}`
+      })
+      .join(' · ')
 
   return (
     <div className="page">
@@ -112,9 +120,7 @@ export function Search() {
                 {peopleResults.map((p) => (
                   <li key={p.id}>
                     <Link to={`/people/${p.id}`} className="request-list__item">
-                      <span className="request-list__name">
-                        {p.name || maskCardNumber(p.cardNumber)}
-                      </span>
+                      <span className="request-list__name">{personTitle(p)}</span>
                       <span className="request-list__meta">{maskCardNumber(p.cardNumber)}</span>
                     </Link>
                   </li>
@@ -123,33 +129,23 @@ export function Search() {
             </>
           )}
 
-          {openItems.length > 0 && (
+          {activeCases.length > 0 && (
             <>
-              <h2 className="product-detail__section-title">Open items</h2>
+              <h2 className="product-detail__section-title">Active cases</h2>
               <ul className="request-list">
-                {openItems.map((item) => (
-                  <li key={item.id}>
-                    <Link to={`/requests/${item.requestId}`} className="request-list__item">
-                      <span className="request-list__name">{itemLabel(item)}</span>
-                      <span className={`badge item-row__status item-row__status--${item.status}`}>{STATUS_LABELS[item.status]}</span>
-                    </Link>
-                  </li>
+                {activeCases.map((c) => (
+                  <CaseRow key={c.request.id} summary={c} detail={matchDetail(c.request.id!)} />
                 ))}
               </ul>
             </>
           )}
 
-          {pastItems.length > 0 && (
+          {finishedCases.length > 0 && (
             <>
-              <h2 className="product-detail__section-title">Past items</h2>
+              <h2 className="product-detail__section-title">Finished cases</h2>
               <ul className="request-list">
-                {pastItems.map((item) => (
-                  <li key={item.id}>
-                    <Link to={`/requests/${item.requestId}`} className="request-list__item">
-                      <span className="request-list__name">{itemLabel(item)}</span>
-                      <span className={`badge item-row__status item-row__status--${item.status}`}>{STATUS_LABELS[item.status]}</span>
-                    </Link>
-                  </li>
+                {finishedCases.map((c) => (
+                  <CaseRow key={c.request.id} summary={c} detail={matchDetail(c.request.id!)} />
                 ))}
               </ul>
             </>

@@ -2,12 +2,32 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { db } from '../../../db/schema'
-import { addItem, createRequest, findOrCreatePerson, hasOpenDuplicate } from '../../../db/repo'
+import { addItem, createRequest, findOrCreatePerson, hasOpenDuplicate, updatePerson } from '../../../db/repo'
 import type { Plan, Presentation } from '../../../db/types'
 import { search } from '../../../search/searchIndex'
 import { useSearchIndex } from '../../../search/useSearchIndex'
-import { maskCardNumber } from '../../../ui/format'
+import { personTitle } from '../../../ui/format'
 import './requests.css'
+
+// Egyptian military ranks, offered as suggestions (free text is still allowed).
+const RANKS = [
+  'جندي',
+  'عريف',
+  'رقيب',
+  'رقيب أول',
+  'مساعد',
+  'مساعد أول',
+  'ملازم',
+  'ملازم أول',
+  'نقيب',
+  'رائد',
+  'مقدم',
+  'عقيد',
+  'عميد',
+  'لواء',
+  'فريق',
+  'فريق أول',
+]
 
 interface DraftItem {
   key: string
@@ -22,6 +42,9 @@ export function NewRequest() {
   const index = useSearchIndex()
 
   const [cardNumber, setCardNumber] = useState('')
+  // null = untouched, so a known card shows the saved name/rank.
+  const [nameDraft, setNameDraft] = useState<string | null>(null)
+  const [rankDraft, setRankDraft] = useState<string | null>(null)
   const [plan, setPlan] = useState<Plan>('monthly')
   const [draftItems, setDraftItems] = useState<DraftItem[]>([])
 
@@ -36,6 +59,20 @@ export function NewRequest() {
     () => (cardNumber ? db.people.where('cardNumber').equals(cardNumber).first() : undefined),
     [cardNumber],
   )
+
+  const name = nameDraft ?? existingPerson?.name ?? ''
+  const rank = rankDraft ?? existingPerson?.rank ?? ''
+
+  const changeCard = (value: string) => {
+    setCardNumber(value)
+    setNameDraft(null)
+    setRankDraft(null)
+  }
+
+  const usedRanks = useLiveQuery(async () => {
+    const people = await db.people.toArray()
+    return [...new Set([...people.map((p) => p.rank?.trim()).filter(Boolean), ...RANKS])] as string[]
+  }, [])
 
   const recentRequests = useLiveQuery(
     () => db.requests.orderBy('createdAt').reverse().limit(5).toArray(),
@@ -120,7 +157,11 @@ export function NewRequest() {
     if (!canCreate) return
     setCreating(true)
     try {
-      const person = await findOrCreatePerson(db, cardNumber.trim())
+      const details = { name: name.trim() || undefined, rank: rank.trim() || undefined }
+      const person = await findOrCreatePerson(db, cardNumber.trim(), details)
+      if (person.name !== details.name || person.rank !== details.rank) {
+        await updatePerson(db, person.id!, details)
+      }
       const requestId = await createRequest(db, person.id!, plan)
       for (const item of draftItems) {
         await addItem(db, requestId, item.presentationId, item.qty)
@@ -142,16 +183,46 @@ export function NewRequest() {
           inputMode="numeric"
           pattern="[0-9]*"
           value={cardNumber}
-          onChange={(e) => setCardNumber(e.target.value.replace(/[^0-9]/g, ''))}
+          onChange={(e) => changeCard(e.target.value.replace(/[^0-9]/g, ''))}
           placeholder="e.g. 12345"
         />
       </label>
 
       {existingPerson && (
         <p className="new-request__existing">
-          Existing: {existingPerson.name || 'unnamed'} ({existingPerson.cardNumber})
+          Returning: {personTitle(existingPerson)} — details filled in from last time
         </p>
       )}
+
+      <div className="new-request__person">
+        <label className="field">
+          <span className="field__label">Name</span>
+          <input
+            className="field__input"
+            value={name}
+            onChange={(e) => setNameDraft(e.target.value)}
+            placeholder="e.g. أحمد علي"
+            autoComplete="off"
+          />
+        </label>
+        <label className="field">
+          <span className="field__label">Rank · رتبة</span>
+          <input
+            className="field__input"
+            value={rank}
+            onChange={(e) => setRankDraft(e.target.value)}
+            list="rank-options"
+            placeholder="e.g. عقيد"
+            dir="auto"
+            autoComplete="off"
+          />
+          <datalist id="rank-options">
+            {usedRanks?.map((r) => (
+              <option key={r} value={r} />
+            ))}
+          </datalist>
+        </label>
+      </div>
 
       {!cardNumber && recentPeople && recentPeople.length > 0 && (
         <div className="chip-row new-request__recent">
@@ -160,9 +231,9 @@ export function NewRequest() {
               key={p.id}
               type="button"
               className="chip"
-              onClick={() => setCardNumber(p.cardNumber)}
+              onClick={() => changeCard(p.cardNumber)}
             >
-              {p.name || maskCardNumber(p.cardNumber)}
+              {personTitle(p)}
             </button>
           ))}
         </div>

@@ -19,7 +19,7 @@ import type {
 } from './types'
 
 export const OPEN_STATUSES: ItemStatus[] = ['searching', 'found', 'transferred']
-const CLOSED_STATUSES: ItemStatus[] = ['delivered', 'unavailable', 'cancelled']
+export const CLOSED_STATUSES: ItemStatus[] = ['delivered', 'unavailable', 'cancelled']
 
 // Dexie types an auto-increment `add()` as resolving to the (optional) key
 // property's type, i.e. `number | undefined` since our entities declare
@@ -180,6 +180,7 @@ export async function createRequest(
     paid: false,
     notes,
     nextDueDate: nextDueDate(createdAt, plan),
+    feeRefunded: false,
   }
   return addEntity(db.requests.add(request))
 }
@@ -276,35 +277,6 @@ export async function setItemStatus(
   if (status === 'delivered') patch.deliveredAt = entry.at
 
   await db.items.update(itemId, patch)
-}
-
-export async function setFeeRefunded(
-  db: SarfDB,
-  itemId: number,
-  refunded: boolean,
-): Promise<void> {
-  await db.items.update(itemId, {
-    feeRefunded: refunded,
-    feeRefundedAt: refunded ? Date.now() : undefined,
-  })
-}
-
-export async function requestIsComplete(db: SarfDB, requestId: number): Promise<boolean> {
-  const items = await db.items.where('requestId').equals(requestId).toArray()
-  if (items.length === 0) return false
-  return items.every((item) => {
-    if (!CLOSED_STATUSES.includes(item.status)) return false
-    if (item.status === 'delivered') return item.feeRefunded
-    return true
-  })
-}
-
-export async function moneyOwed(db: SarfDB): Promise<number> {
-  const requests = await db.requests.toArray()
-  const feeByRequestId = new Map(requests.map((r) => [r.id!, r.feePerItem]))
-  const delivered = await db.items.where('status').equals('delivered').toArray()
-  const owed = delivered.filter((i) => !i.feeRefunded)
-  return owed.reduce((sum, i) => sum + (feeByRequestId.get(i.requestId) ?? 0), 0)
 }
 
 // ---------------------------------------------------------------------------
@@ -478,23 +450,6 @@ export async function mostUsedLocations(db: SarfDB, type?: LocationType): Promis
 // Home dashboard — VISION §5.5.
 // ---------------------------------------------------------------------------
 
-export interface OpenItemsSummary {
-  searching: number
-  found: number
-  transferred: number
-}
-
-export async function openItemsSummary(db: SarfDB): Promise<OpenItemsSummary> {
-  const items = await db.items.toArray()
-  const summary: OpenItemsSummary = { searching: 0, found: 0, transferred: 0 }
-  for (const i of items) {
-    if (i.status === 'searching' || i.status === 'found' || i.status === 'transferred') {
-      summary[i.status]++
-    }
-  }
-  return summary
-}
-
 export interface DueEntry {
   request: Request
   person: Person
@@ -522,15 +477,6 @@ export async function dueSoon(db: SarfDB, withinDays = 5): Promise<DueEntry[]> {
     .map((id) => ({ request: nearestByPerson.get(id)!, person: personById.get(id)! }))
     .filter((e): e is DueEntry => !!e.person)
     .sort((a, b) => a.request.nextDueDate - b.request.nextDueDate)
-}
-
-// Items still open `olderThanDays` after they were first created.
-export async function staleItems(db: SarfDB, olderThanDays = 3): Promise<Item[]> {
-  const cutoff = Date.now() - olderThanDays * 24 * 60 * 60 * 1000
-  const items = await db.items.toArray()
-  return items.filter(
-    (i) => OPEN_STATUSES.includes(i.status) && (i.statusHistory[0]?.at ?? 0) <= cutoff,
-  )
 }
 
 // ---------------------------------------------------------------------------
@@ -592,23 +538,28 @@ export async function shoppingList(db: SarfDB): Promise<ShoppingLine[]> {
   const productIds = [...new Set([...presentationById.values()].map((p) => p.productId))]
   const products = await db.products.bulkGet(productIds)
   const productById = new Map(products.filter((p): p is Product => !!p).map((p) => [p.id!, p]))
+  // Searching meds are listed under the pharmacy they were last found at, so
+  // the list matches where you'll actually go; unknown ones stay generic.
+  const known = await knownLocationsByProduct(db)
+  const targetLocation = (item: Item): number | undefined => {
+    if (item.status === 'transferred') return item.transferToLocationId
+    const productId = presentationById.get(item.presentationId)?.productId
+    return productId !== undefined ? known.get(productId)?.foundAt : undefined
+  }
   const locationIds = [
-    ...new Set(
-      items
-        .filter((i) => i.status === 'transferred' && i.transferToLocationId != null)
-        .map((i) => i.transferToLocationId!),
-    ),
+    ...new Set(items.map(targetLocation).filter((id): id is number => id != null)),
   ]
   const locations = await db.locations.bulkGet(locationIds)
   const locationById = new Map(locations.filter((l): l is Location => !!l).map((l) => [l.id!, l]))
 
   const lineByKey = new Map<string, ShoppingLine>()
   for (const item of items) {
-    const isTransferred = item.status === 'transferred' && item.transferToLocationId != null
-    const groupKey = isTransferred ? `loc-${item.transferToLocationId}` : 'hospital'
-    const groupLabel = isTransferred
-      ? (locationById.get(item.transferToLocationId!)?.name ?? 'Unknown location')
-      : 'Hospital pharmacies'
+    const locationId = targetLocation(item)
+    const groupKey = locationId != null ? `loc-${locationId}` : 'hospital'
+    const groupLabel =
+      locationId != null
+        ? (locationById.get(locationId)?.name ?? 'Unknown location')
+        : 'Hospital pharmacies'
     const key = `${groupKey}:${item.presentationId}`
     const pres = presentationById.get(item.presentationId)
     const prod = pres ? productById.get(pres.productId) : undefined
@@ -621,7 +572,7 @@ export async function shoppingList(db: SarfDB): Promise<ShoppingLine[]> {
       lineByKey.set(key, {
         groupKey,
         groupLabel,
-        locationId: isTransferred ? item.transferToLocationId : undefined,
+        locationId,
         presentationId: item.presentationId,
         productName: prod?.nameEn ?? 'Unknown',
         presentationLabel: [pres?.strength, pres?.form].filter(Boolean).join(' '),
@@ -634,6 +585,49 @@ export async function shoppingList(db: SarfDB): Promise<ShoppingLine[]> {
   return [...lineByKey.values()].sort(
     (a, b) => a.groupLabel.localeCompare(b.groupLabel) || a.productName.localeCompare(b.productName),
   )
+}
+
+// ---------------------------------------------------------------------------
+// Remembered pharmacies: where each drug was last found / transferred to.
+// Learned from status history, so registering it once is enough.
+// ---------------------------------------------------------------------------
+
+export interface KnownLocations {
+  foundAt?: number
+  transferTo?: number
+}
+
+export async function knownLocationsByProduct(db: SarfDB): Promise<Map<number, KnownLocations>> {
+  const [items, presentations] = await Promise.all([
+    db.items.toArray(),
+    db.presentations.toArray(),
+  ])
+  const productByPresentation = new Map(presentations.map((p) => [p.id!, p.productId]))
+  const latest = new Map<number, { found?: [number, number]; transfer?: [number, number] }>()
+
+  for (const item of items) {
+    const productId = productByPresentation.get(item.presentationId)
+    if (productId === undefined) continue
+    const entry = latest.get(productId) ?? {}
+    for (const h of item.statusHistory) {
+      if (h.locationId == null) continue
+      if (h.status === 'found' && (!entry.found || h.at >= entry.found[1])) {
+        entry.found = [h.locationId, h.at]
+      }
+      if (h.status === 'transferred' && (!entry.transfer || h.at >= entry.transfer[1])) {
+        entry.transfer = [h.locationId, h.at]
+      }
+    }
+    latest.set(productId, entry)
+  }
+
+  const result = new Map<number, KnownLocations>()
+  for (const [productId, e] of latest) {
+    if (e.found || e.transfer) {
+      result.set(productId, { foundAt: e.found?.[0], transferTo: e.transfer?.[0] })
+    }
+  }
+  return result
 }
 
 export async function markLineFound(db: SarfDB, itemIds: number[], locationId: number): Promise<void> {

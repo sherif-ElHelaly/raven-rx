@@ -1,21 +1,16 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { dueSoon, moneyOwed, openItemsSummary, staleItems } from '../../db/repo'
+import { homeTotals, loadCases } from '../../db/cases'
+import { dueSoon } from '../../db/repo'
 import { db } from '../../db/schema'
 import { backUpNow } from '../../ui/backupExport'
 import { daysSinceLastBackup } from '../../ui/localPrefs'
 import './pages.css'
 
 export function Home() {
-  const owed = useLiveQuery(() => moneyOwed(db), [])
-  const openSummary = useLiveQuery(() => openItemsSummary(db), [])
+  const totals = useLiveQuery(async () => homeTotals(await loadCases(db)), [])
   const due = useLiveQuery(() => dueSoon(db, 5), [])
-  const stale = useLiveQuery(() => staleItems(db, 3), [])
-
-  const openTotal = openSummary
-    ? openSummary.searching + openSummary.found + openSummary.transferred
-    : 0
   const hasOwnData = useLiveQuery(async () => (await db.requests.count()) > 0, [])
   const [backupAge, setBackupAge] = useState(daysSinceLastBackup)
   const [backingUp, setBackingUp] = useState(false)
@@ -59,15 +54,18 @@ export function Home() {
       )}
 
       <Link to="/items/owed" className="home-tile home-tile--link">
-        <span className="home-tile__value">{owed ?? 0} EGP</span>
-        <span className="home-tile__label">Owed to you (delivered, not yet refunded)</span>
+        <span className="home-tile__value">{totals?.owedTotal ?? 0} EGP</span>
+        <span className="home-tile__label">
+          Owed to you — {totals?.owedCases ?? 0} case{totals?.owedCases === 1 ? '' : 's'} not yet
+          collected
+        </span>
       </Link>
 
       <Link to="/items/open" className="home-tile home-tile--link">
-        <span className="home-tile__value">{openTotal}</span>
+        <span className="home-tile__value">{totals?.activeCases ?? 0}</span>
         <span className="home-tile__label">
-          Open items — {openSummary?.searching ?? 0} searching · {openSummary?.found ?? 0} found ·{' '}
-          {openSummary?.transferred ?? 0} transferred
+          Active cases — meds: {totals?.openMeds.searching ?? 0} searching ·{' '}
+          {totals?.openMeds.found ?? 0} found · {totals?.openMeds.transferred ?? 0} transferred
         </span>
       </Link>
 
@@ -77,8 +75,8 @@ export function Home() {
       </Link>
 
       <Link to="/items/stale" className="home-tile home-tile--link">
-        <span className="home-tile__value">{stale?.length ?? 0}</span>
-        <span className="home-tile__label">Stale items — open more than 3 days</span>
+        <span className="home-tile__value">{totals?.staleCases ?? 0}</span>
+        <span className="home-tile__label">Stale cases — open more than 3 days</span>
       </Link>
 
       <div className="home-links">

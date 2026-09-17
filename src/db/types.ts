@@ -128,6 +128,12 @@ export interface Request {
   paidAt?: number
   notes?: string
   nextDueDate: number
+  // The case fee (feePerItem × every med) is collected back once per case.
+  // Undefined on cases created before this field existed — see caseFeeRefunded().
+  feeRefunded?: boolean
+  feeRefundedAt?: number
+  // Set by "Close case" (leftover meds marked unavailable).
+  closedAt?: number
 }
 
 export interface StatusHistoryEntry {

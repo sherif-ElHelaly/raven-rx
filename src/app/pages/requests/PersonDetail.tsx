@@ -1,12 +1,14 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { summarizeCase } from '../../../db/cases'
 import { createRenewalRequest, setRegularMeds, updatePerson } from '../../../db/repo'
 import { db } from '../../../db/schema'
 import type { Plan, RegularMed } from '../../../db/types'
 import { search } from '../../../search/searchIndex'
 import { useSearchIndex } from '../../../search/useSearchIndex'
-import { maskCardNumber } from '../../../ui/format'
+import { personTitle } from '../../../ui/format'
+import { CaseRow } from './CaseRow'
 import './requests.css'
 
 export function PersonDetail() {
@@ -20,6 +22,10 @@ export function PersonDetail() {
     () => db.requests.where('personId').equals(id).reverse().sortBy('createdAt'),
     [id],
   )
+  const caseItems = useLiveQuery(async () => {
+    const ids = (requests ?? []).map((r) => r.id!)
+    return ids.length ? db.items.where('requestId').anyOf(ids).toArray() : []
+  }, [requests])
 
   const products = useLiveQuery(() => db.products.toArray(), [])
   const productById = new Map((products ?? []).map((p) => [p.id!, p]))
@@ -109,7 +115,7 @@ export function PersonDetail() {
         <button className="top-bar__back" onClick={() => navigate(-1)} aria-label="Back">
           ←
         </button>
-        <span className="top-bar__title">{person.name || maskCardNumber(person.cardNumber)}</span>
+        <span className="top-bar__title">{personTitle(person)}</span>
       </div>
 
       {!editingInfo ? (
@@ -134,7 +140,7 @@ export function PersonDetail() {
             <input className="field__input" value={name} onChange={(e) => setName(e.target.value)} />
           </label>
           <label className="field">
-            <span className="field__label">Rank</span>
+            <span className="field__label">Rank · رتبة</span>
             <input className="field__input" value={rank} onChange={(e) => setRank(e.target.value)} />
           </label>
           <label className="field">
@@ -255,25 +261,16 @@ export function PersonDetail() {
         {renewing ? 'Creating…' : `Renew (${regularMeds.length} item${regularMeds.length === 1 ? '' : 's'})`}
       </button>
 
-      <h2 className="product-detail__section-title">Past requests</h2>
+      <h2 className="product-detail__section-title">Cases</h2>
       <ul className="request-list">
         {requests?.map((r) => (
-          <li key={r.id}>
-            <button
-              type="button"
-              className="request-list__item"
-              style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer' }}
-              onClick={() => navigate(`/requests/${r.id}`)}
-            >
-              <span className="request-list__name">
-                {r.plan === 'monthly' ? 'Monthly' : 'Bimonthly'}
-              </span>
-              <span className="request-list__meta">{new Date(r.createdAt).toLocaleDateString()}</span>
-            </button>
-          </li>
+          <CaseRow
+            key={r.id}
+            summary={summarizeCase(r, person, (caseItems ?? []).filter((i) => i.requestId === r.id))}
+          />
         ))}
       </ul>
-      {requests && requests.length === 0 && <p className="empty-state">No past requests.</p>}
+      {requests && requests.length === 0 && <p className="empty-state">No cases yet.</p>}
     </div>
   )
 }

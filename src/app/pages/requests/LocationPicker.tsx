@@ -8,9 +8,11 @@ interface LocationPickerProps {
   title: string
   onPick: (location: Location) => void
   onClose: () => void
+  // Offer "No location" so a status change never blocks on picking one.
+  onSkip?: () => void
 }
 
-export function LocationPicker({ title, onPick, onClose }: LocationPickerProps) {
+export function LocationPicker({ title, onPick, onClose, onSkip }: LocationPickerProps) {
   const locations = useLiveQuery(() => mostUsedLocations(db), [])
 
   return (
@@ -36,6 +38,12 @@ export function LocationPicker({ title, onPick, onClose }: LocationPickerProps) 
             {loc.needsTransferSlip && ' 📋'}
           </button>
         ))}
+
+        {onSkip && (
+          <button type="button" className="sheet__option sheet__option--muted" onClick={onSkip}>
+            No location
+          </button>
+        )}
 
         <button type="button" className="sheet__cancel" onClick={onClose}>
           Cancel

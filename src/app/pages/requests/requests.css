@@ -205,56 +205,82 @@
   gap: var(--space-2);
 }
 
-.item-row-wrap {
-  position: relative;
-  overflow: hidden;
+.item-row {
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
-}
-
-.item-row__swipe-hint {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  padding-left: var(--space-4);
-  color: var(--color-accent-strong);
-  font-size: 13px;
-  font-weight: 600;
-  background: var(--color-accent-bg);
-}
-
-.item-row {
-  position: relative;
-  background: var(--color-surface);
-  padding: var(--space-3) var(--space-4);
-  touch-action: pan-y;
-  cursor: grab;
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4);
 }
 
 .item-row__main {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
-  gap: var(--space-2);
+  gap: var(--space-3);
 }
 
 .item-row__label {
   font-size: 15px;
   font-weight: 600;
+  min-width: 0;
 }
 
 .item-row__qty {
   font-family: var(--font-mono);
   color: var(--color-text-muted);
   font-size: 13px;
+  font-weight: 400;
 }
 
-.item-row__footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: var(--space-2);
+.item-row__location {
+  display: block;
+  margin-top: 6px;
+  padding: 0;
+  background: none;
+  border: none;
+  font: inherit;
+  font-size: 13px;
+  color: var(--color-accent-strong);
+  text-align: left;
+  cursor: pointer;
+}
+
+.item-row__location--static {
+  color: var(--color-text-dim);
+  cursor: default;
+}
+
+/* Native status dropdown styled as a coloured pill; tapping opens the iOS picker. */
+.status-select {
+  position: relative;
+  flex-shrink: 0;
+  border-radius: var(--radius-pill);
+}
+
+.status-select select {
+  appearance: none;
+  -webkit-appearance: none;
+  min-height: 40px;
+  padding: 0 30px 0 14px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  /* 16px or more, or iOS Safari zooms the page when the picker opens. */
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.status-select::after {
+  content: '▾';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  pointer-events: none;
 }
 
 .item-row__status {
@@ -282,22 +308,6 @@
 .item-row__status--cancelled {
   background: var(--color-signal-bg);
   color: var(--color-signal);
-}
-
-.item-row__refund {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  font-size: 12px;
-  color: var(--color-text-muted);
-}
-
-.item-row__menu-btn {
-  background: none;
-  border: none;
-  color: var(--color-text-dim);
-  font-size: 18px;
-  padding: 0 var(--space-2);
 }
 
 /* Bottom sheet */
@@ -362,4 +372,185 @@
   color: var(--color-text-dim);
   padding: var(--space-3) 0 0;
   font-size: 15px;
+}
+
+/* Case rows — one per request, all meds summarised */
+
+.case-row {
+  align-items: flex-start;
+}
+
+.case-row__body {
+  min-width: 0;
+}
+
+.case-row__progress,
+.case-row__detail {
+  display: block;
+  font-size: 12px;
+  color: var(--color-text-dim);
+  margin-top: 4px;
+}
+
+.case-row__side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-1);
+  flex-shrink: 0;
+}
+
+.case-row__owed {
+  font-family: var(--font-mono);
+}
+
+.badge--done {
+  background: var(--color-tier-exact-bg);
+  color: var(--color-tier-exact);
+}
+
+.case-list__total {
+  margin: 0 0 var(--space-3);
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+/* Active / Finished tabs */
+
+.segmented {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.segmented__option {
+  flex: 1;
+  min-height: 40px;
+  border: none;
+  border-radius: calc(var(--radius) - 4px);
+  background: none;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.segmented__option--active {
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+}
+
+.segmented__count {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-text-dim);
+  margin-left: 4px;
+}
+
+.sheet__option--muted {
+  color: var(--color-text-muted);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Case fee: one amount per case, collected once */
+
+.case-fee {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4);
+  background: var(--color-signal-bg);
+  border: 1px solid rgba(224, 39, 27, 0.3);
+  border-radius: var(--radius);
+}
+
+.case-fee--collected {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+
+.case-fee__amount {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-signal);
+}
+
+.case-fee--collected .case-fee__amount {
+  color: var(--color-tier-exact);
+}
+
+.case-fee__breakdown {
+  display: block;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.case-fee__toggle {
+  flex-shrink: 0;
+  min-height: 40px;
+  padding: var(--space-2) 14px;
+  font-size: 14px;
+}
+
+.case-fee + .btn {
+  margin-top: var(--space-4);
+}
+
+.case-items-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.case-close-btn {
+  margin-top: var(--space-5);
+  color: var(--color-text-muted);
+}
+
+.case-close__collected {
+  margin: var(--space-3) 0 var(--space-4);
+}
+
+.case-finished-banner {
+  margin: 0 0 var(--space-3);
+  padding: var(--space-2) 14px;
+  border-radius: var(--radius);
+  background: var(--color-tier-exact-bg);
+  color: var(--color-tier-exact);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.handover__still-open {
+  margin: var(--space-3) 0 0;
+  font-size: 13px;
+  color: var(--color-text-dim);
+}
+
+.new-request__person {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: var(--space-3);
+}
+
+.new-request__person .field__input {
+  width: 100%;
+  min-width: 0;
 }

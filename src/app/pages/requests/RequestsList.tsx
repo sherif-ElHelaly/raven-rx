@@ -1,26 +1,20 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
+import { loadCases } from '../../../db/cases'
 import { db } from '../../../db/schema'
-import { maskCardNumber } from '../../../ui/format'
-import { CLOSED_STATUSES } from './statusMeta'
+import { CaseRow } from './CaseRow'
 import './requests.css'
 
 export function RequestsList() {
-  const requests = useLiveQuery(
-    () => db.requests.orderBy('createdAt').reverse().toArray(),
-    [],
-  )
-  const people = useLiveQuery(() => db.people.toArray(), [])
-  const items = useLiveQuery(() => db.items.toArray(), [])
+  const [params, setParams] = useSearchParams()
+  const tab = params.get('tab') === 'finished' ? 'finished' : 'active'
+  const cases = useLiveQuery(() => loadCases(db), [])
 
-  const personById = new Map((people ?? []).map((p) => [p.id!, p]))
-
-  const openCountByRequestId = new Map<number, number>()
-  for (const item of items ?? []) {
-    if (!CLOSED_STATUSES.includes(item.status)) {
-      openCountByRequestId.set(item.requestId, (openCountByRequestId.get(item.requestId) ?? 0) + 1)
-    }
-  }
+  const active = (cases ?? []).filter((c) => !c.finished)
+  const finished = (cases ?? [])
+    .filter((c) => c.finished)
+    .sort((a, b) => b.lastActivityAt - a.lastActivityAt)
+  const shown = tab === 'active' ? active : finished
 
   return (
     <div className="page">
@@ -31,36 +25,39 @@ export function RequestsList() {
         </Link>
       </div>
 
-      {requests && requests.length === 0 && (
-        <p className="empty-state">No requests yet. Tap + New to log one.</p>
+      <div className="segmented" role="tablist">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === 'active'}
+          className={`segmented__option${tab === 'active' ? ' segmented__option--active' : ''}`}
+          onClick={() => setParams({}, { replace: true })}
+        >
+          Active <span className="segmented__count">{active.length}</span>
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === 'finished'}
+          className={`segmented__option${tab === 'finished' ? ' segmented__option--active' : ''}`}
+          onClick={() => setParams({ tab: 'finished' }, { replace: true })}
+        >
+          Finished <span className="segmented__count">{finished.length}</span>
+        </button>
+      </div>
+
+      {cases && shown.length === 0 && (
+        <p className="empty-state">
+          {tab === 'active'
+            ? 'No active cases. Tap + New to log one.'
+            : 'Finished cases show up here once every med is closed and the fee is collected.'}
+        </p>
       )}
 
       <ul className="request-list">
-        {requests?.map((r) => {
-          const person = personById.get(r.personId)
-          const openCount = openCountByRequestId.get(r.id!) ?? 0
-          return (
-            <li key={r.id}>
-              <Link to={`/requests/${r.id}`} className="request-list__item">
-                <div>
-                  <span className="request-list__name">
-                    {person?.name || (person ? maskCardNumber(person.cardNumber) : '…')}
-                  </span>
-                  <span className="request-list__meta">
-                    {r.plan === 'monthly' ? 'Monthly' : 'Bimonthly'} ·{' '}
-                    {new Date(r.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-                <div className="request-list__flags">
-                  {openCount > 0 && <span className="badge badge--warn">{openCount} open</span>}
-                  {r.registered && <span title="Registered">✓R</span>}
-                  {r.approved && <span title="Approved">✓A</span>}
-                  {r.paid && <span title="Paid">✓P</span>}
-                </div>
-              </Link>
-            </li>
-          )
-        })}
+        {shown.map((c) => (
+          <CaseRow key={c.request.id} summary={c} />
+        ))}
       </ul>
     </div>
   )

@@ -1,11 +1,10 @@
-import { useRef, useState } from 'react'
-import type { Item, ItemStatus, Location } from '../../../db/types'
-import { nextStatus, setFeeRefunded } from '../../../db/repo'
+import { useState } from 'react'
+import { knownLocationFor } from '../../../db/cases'
 import { db } from '../../../db/schema'
+import type { Item, ItemStatus, Location } from '../../../db/types'
 import { LocationPicker } from './LocationPicker'
-import { StatusSheet } from './StatusSheet'
 import { TransferSlipSheet } from './TransferSlipSheet'
-import { STATUS_LABELS } from './statusMeta'
+import { STATUS_LABELS, STATUS_ORDER } from './statusMeta'
 
 export interface StatusOpts {
   locationId?: number
@@ -16,171 +15,111 @@ interface ItemRowProps {
   item: Item
   label: string
   flags?: { fridge: boolean; controlled: boolean }
+  locationNames: Map<number, string>
   onSetStatus: (status: ItemStatus, previous: ItemStatus, opts?: StatusOpts) => void
 }
 
-const NEEDS_LOCATION: ItemStatus[] = ['found', 'transferred']
+type LocatedStatus = 'found' | 'transferred'
 
-const SWIPE_THRESHOLD = 72
-const LONG_PRESS_MS = 500
-const MOVE_CANCEL_THRESHOLD = 10
+function isLocated(status: ItemStatus): status is LocatedStatus {
+  return status === 'found' || status === 'transferred'
+}
 
-export function ItemRow({ item, label, flags, onSetStatus }: ItemRowProps) {
-  const [dragX, setDragX] = useState(0)
-  const [dragging, setDragging] = useState(false)
-  const [sheetOpen, setSheetOpen] = useState(false)
-  const [pendingStatus, setPendingStatus] = useState<ItemStatus | null>(null)
-  const [pendingTransferLocation, setPendingTransferLocation] = useState<Location | null>(null)
+// Status is a native dropdown (the iOS picker wheel): one tap to open, one to
+// choose. Found / Transferred reuse the pharmacy this drug was last found at or
+// sent to, so the location is only asked the first time.
+export function ItemRow({ item, label, flags, locationNames, onSetStatus }: ItemRowProps) {
+  const [picking, setPicking] = useState<LocatedStatus | null>(null)
+  const [slipFor, setSlipFor] = useState<Location | null>(null)
 
-  const startX = useRef(0)
-  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const longPressFired = useRef(false)
+  const apply = (status: ItemStatus, opts?: StatusOpts) => onSetStatus(status, item.status, opts)
 
-  const advanceTarget = nextStatus(item.status)
-
-  const applyStatus = (status: ItemStatus, opts?: StatusOpts) => {
-    onSetStatus(status, item.status, opts)
-  }
-
-  const pickStatus = (status: ItemStatus) => {
-    if (NEEDS_LOCATION.includes(status)) {
-      setPendingStatus(status)
-    } else {
-      applyStatus(status)
-    }
-  }
-
-  const handleLocationPicked = (status: ItemStatus, location: Location) => {
-    if (status === 'transferred' && location.needsTransferSlip) {
-      setPendingTransferLocation(location)
-      setPendingStatus(null)
+  const handleSelect = async (status: ItemStatus) => {
+    if (status === item.status) return
+    if (!isLocated(status)) {
+      apply(status)
       return
     }
-    applyStatus(status, { locationId: location.id })
-    setPendingStatus(null)
+    // A transferred med is found where it was transferred to.
+    const remembered =
+      status === 'found' && item.status === 'transferred' && item.transferToLocationId != null
+        ? item.transferToLocationId
+        : await knownLocationFor(db, item.presentationId, status)
+    if (remembered != null) apply(status, { locationId: remembered })
+    else setPicking(status)
   }
 
-  const clearLongPress = () => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current)
-      longPressTimer.current = null
+  const handlePicked = (status: LocatedStatus, location: Location | null) => {
+    setPicking(null)
+    if (status === 'transferred' && location?.needsTransferSlip) {
+      setSlipFor(location)
+      return
     }
+    apply(status, { locationId: location?.id })
   }
 
-  const handlePointerDown = (e: React.PointerEvent) => {
-    if (!advanceTarget) return
-    startX.current = e.clientX
-    longPressFired.current = false
-    setDragging(true)
-    longPressTimer.current = setTimeout(() => {
-      longPressFired.current = true
-      setDragging(false)
-      setDragX(0)
-      setSheetOpen(true)
-    }, LONG_PRESS_MS)
-  }
-
-  const handlePointerMove = (e: React.PointerEvent) => {
-    if (!dragging || longPressFired.current) return
-    const delta = e.clientX - startX.current
-    if (Math.abs(delta) > MOVE_CANCEL_THRESHOLD) clearLongPress()
-    // Only allow rightward swipe (advance), clamp for a bit of resistance.
-    setDragX(Math.max(0, Math.min(delta, SWIPE_THRESHOLD * 1.4)))
-  }
-
-  const finishDrag = () => {
-    clearLongPress()
-    setDragging(false)
-    if (!longPressFired.current && dragX >= SWIPE_THRESHOLD && advanceTarget) {
-      pickStatus(advanceTarget)
-    }
-    setDragX(0)
-  }
-
-  const handlePointerUp = () => finishDrag()
-  const handlePointerCancel = () => {
-    clearLongPress()
-    setDragging(false)
-    setDragX(0)
-  }
-
-  // Long-press also available via a dedicated button, since real long-press
-  // via mouse-hold doesn't work well with automated/keyboard interaction.
-  const openMenu = () => setSheetOpen(true)
+  const locationId =
+    item.status === 'found'
+      ? item.foundAtLocationId
+      : item.status === 'transferred'
+        ? item.transferToLocationId
+        : item.status === 'delivered'
+          ? item.foundAtLocationId
+          : undefined
+  const locationName = locationId != null ? locationNames.get(locationId) : undefined
 
   return (
-    <li className="item-row-wrap">
-      {advanceTarget && (
-        <div className="item-row__swipe-hint" aria-hidden="true">
-          → {STATUS_LABELS[advanceTarget]}
-        </div>
-      )}
-      <div
-        className="item-row"
-        style={{ transform: `translateX(${dragX}px)` }}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerCancel={handlePointerCancel}
-        onPointerLeave={dragging ? handlePointerCancel : undefined}
-      >
-        <div className="item-row__main">
-          <span className="item-row__label">
-            {label}
-            {flags?.fridge && <span aria-label="requires fridge"> ❄️</span>}
-            {flags?.controlled && <span aria-label="controlled drug"> ⚠️</span>}
-          </span>
-          <span className="item-row__qty">×{item.qty}</span>
-        </div>
-        <div className="item-row__footer">
-          <span className={`badge item-row__status item-row__status--${item.status}`}>
-            {STATUS_LABELS[item.status]}
-          </span>
-          {item.status === 'delivered' && (
-            <label className="item-row__refund">
-              <input
-                type="checkbox"
-                checked={item.feeRefunded}
-                onChange={(e) => setFeeRefunded(db, item.id!, e.target.checked)}
-              />
-              Refunded
-            </label>
-          )}
-          <button type="button" className="item-row__menu-btn" onClick={openMenu}>
-            ⋯
-          </button>
-        </div>
+    <li className="item-row">
+      <div className="item-row__main">
+        <span className="item-row__label">
+          {label}
+          {flags?.fridge && <span aria-label="requires fridge"> ❄️</span>}
+          {flags?.controlled && <span aria-label="controlled drug"> ⚠️</span>}
+          <span className="item-row__qty"> ×{item.qty}</span>
+        </span>
+        <label className={`status-select item-row__status--${item.status}`}>
+          <span className="visually-hidden">Status of {label}</span>
+          <select value={item.status} onChange={(e) => handleSelect(e.target.value as ItemStatus)}>
+            {STATUS_ORDER.map((s) => (
+              <option key={s} value={s}>
+                {STATUS_LABELS[s]}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
 
-      {sheetOpen && (
-        <StatusSheet
-          current={item.status}
-          onClose={() => setSheetOpen(false)}
-          onPick={(status) => {
-            setSheetOpen(false)
-            pickStatus(status)
-          }}
-        />
+      {isLocated(item.status) && (
+        <button
+          type="button"
+          className="item-row__location"
+          onClick={() => setPicking(item.status as LocatedStatus)}
+        >
+          {locationName
+            ? `${item.status === 'transferred' ? 'to' : 'at'} ${locationName} · change`
+            : `Set ${item.status === 'transferred' ? 'destination' : 'pharmacy'}`}
+        </button>
+      )}
+      {item.status === 'delivered' && locationName && (
+        <span className="item-row__location item-row__location--static">from {locationName}</span>
       )}
 
-      {pendingStatus && (
+      {picking && (
         <LocationPicker
-          title={pendingStatus === 'found' ? 'Found at…' : 'Transfer to…'}
-          onClose={() => setPendingStatus(null)}
-          onPick={(location) => handleLocationPicked(pendingStatus, location)}
+          title={picking === 'found' ? `${label} found at…` : `Transfer ${label} to…`}
+          onClose={() => setPicking(null)}
+          onPick={(location) => handlePicked(picking, location)}
+          onSkip={() => handlePicked(picking, null)}
         />
       )}
 
-      {pendingTransferLocation && (
+      {slipFor && (
         <TransferSlipSheet
-          locationName={pendingTransferLocation.name}
-          onClose={() => setPendingTransferLocation(null)}
+          locationName={slipFor.name}
+          onClose={() => setSlipFor(null)}
           onConfirm={(slipRef) => {
-            applyStatus('transferred', {
-              locationId: pendingTransferLocation.id,
-              transferSlipRef: slipRef,
-            })
-            setPendingTransferLocation(null)
+            apply('transferred', { locationId: slipFor.id, transferSlipRef: slipRef })
+            setSlipFor(null)
           }}
         />
       )}

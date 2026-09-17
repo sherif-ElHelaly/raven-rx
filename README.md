@@ -4,6 +4,10 @@ Personal, offline-first PWA for tracking medication requests and looking up
 Egyptian brand-name substitutes. See [VISION.md](./VISION.md) for the full
 spec, data model and build phases.
 
+Live at https://sherif-elhelaly.github.io/raven-rx/ (deploys on every push to
+`main`). Updating, backing up and changing the code from an iPhone:
+[IPHONE.md](./IPHONE.md).
+
 ## Development
 
 ```bash

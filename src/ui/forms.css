@@ -142,7 +142,7 @@
 
 .top-bar {
   position: sticky;
-  top: 0;
+  top: var(--safe-top);
   z-index: 10;
   display: flex;
   align-items: center;

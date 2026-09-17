@@ -1,16 +1,19 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { exportBackup, importBackup } from '../../../db/backup'
+import { importBackup } from '../../../db/backup'
 import { exportEntityCsvs } from '../../../db/entityCsv'
 import { applySeedImport, diffSeedImport, type ImportDiff } from '../../../db/repo'
 import { db } from '../../../db/schema'
 import { parseSeedCsv } from '../../../db/seedImport'
-import { getPin, setLastBackupAt, setPin } from '../../../ui/localPrefs'
-import { shareOrDownloadFile } from '../../../ui/share'
+import { useAppUpdate } from '../../../ui/AppUpdate'
+import { backUpNow } from '../../../ui/backupExport'
+import { getLastBackupAt, getPin, setLastBackupAt, setPin } from '../../../ui/localPrefs'
+import { shareOrDownloadFiles } from '../../../ui/share'
 import './settings.css'
 
-function timestamp() {
-  return new Date().toISOString().slice(0, 10)
+function formatBackupDate(at: number | null) {
+  if (at === null) return 'Never backed up on this device.'
+  return `Last backup: ${new Date(at).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}`
 }
 
 export function Settings() {
@@ -28,6 +31,28 @@ export function Settings() {
 
   const [pinSet, setPinSet] = useState(() => getPin() !== null)
   const [pinDraft, setPinDraft] = useState('')
+  const [lastBackupAt, setLastBackupAtState] = useState(getLastBackupAt)
+
+  const { updateReady, checkForUpdates, applyUpdate } = useAppUpdate()
+  const [updateStatus, setUpdateStatus] = useState<string | null>(null)
+
+  const handleCheckForUpdates = async () => {
+    setBusy('update-check')
+    setUpdateStatus(null)
+    try {
+      const result = await checkForUpdates()
+      setUpdateStatus(
+        {
+          'update-ready': 'A new version is ready.',
+          'up-to-date': 'You have the latest version.',
+          offline: 'Couldn’t check — you seem to be offline.',
+          unsupported: 'Updates can only be checked in the installed app.',
+        }[result],
+      )
+    } finally {
+      setBusy(null)
+    }
+  }
 
   useEffect(() => {
     if ('storage' in navigator) {
@@ -45,13 +70,11 @@ export function Settings() {
     setBusy('backup')
     setMessage(null)
     try {
-      const data = await exportBackup(db)
-      const file = new File([JSON.stringify(data)], `sarf-backup-${timestamp()}.json`, {
-        type: 'application/json',
-      })
-      await shareOrDownloadFile(file)
-      setLastBackupAt()
-      setMessage('Backup exported.')
+      const result = await backUpNow()
+      if (result !== 'cancelled') {
+        setLastBackupAtState(getLastBackupAt())
+        setMessage('Backup exported.')
+      }
     } finally {
       setBusy(null)
     }
@@ -62,11 +85,11 @@ export function Settings() {
     setMessage(null)
     try {
       const csvs = await exportEntityCsvs(db)
-      for (const [name, content] of Object.entries(csvs)) {
-        const file = new File([content], `sarf-${name}`, { type: 'text/csv' })
-        await shareOrDownloadFile(file)
-      }
-      setMessage('CSV export complete (6 files).')
+      const files = Object.entries(csvs).map(
+        ([name, content]) => new File([content], `raven-rx-${name}`, { type: 'text/csv' }),
+      )
+      const result = await shareOrDownloadFiles(files)
+      if (result !== 'cancelled') setMessage(`CSV export complete (${files.length} files).`)
     } finally {
       setBusy(null)
     }
@@ -134,6 +157,8 @@ export function Settings() {
       const text = await confirmRestoreFile.text()
       const data = JSON.parse(text)
       await importBackup(db, data)
+      setLastBackupAt()
+      setLastBackupAtState(getLastBackupAt())
       setMessage('Backup restored. Everything else was replaced.')
     } catch (err) {
       setMessage(`Restore failed: ${err instanceof Error ? err.message : String(err)}`)
@@ -151,6 +176,33 @@ export function Settings() {
         </button>
         <span className="top-bar__title">Settings</span>
       </div>
+
+      <section className="settings-section">
+        <h2 className="settings-section__title">App version</h2>
+        <p className="settings-section__hint">
+          {__APP_VERSION__}
+          {updateStatus && (
+            <>
+              <br />
+              {updateStatus}
+            </>
+          )}
+        </p>
+        {updateReady ? (
+          <button type="button" className="btn btn--primary btn--block" onClick={applyUpdate}>
+            Update now
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="btn btn--block"
+            disabled={busy === 'update-check'}
+            onClick={handleCheckForUpdates}
+          >
+            {busy === 'update-check' ? 'Checking…' : 'Check for updates'}
+          </button>
+        )}
+      </section>
 
       <section className="settings-section">
         <h2 className="settings-section__title">Locations</h2>
@@ -179,9 +231,11 @@ export function Settings() {
       <section className="settings-section">
         <h2 className="settings-section__title">Full backup</h2>
         <p className="settings-section__hint">
-          A single .json file with everything, including photos. Restoring replaces all data on
-          this device.
+          A single .json file with everything, including photos. In the share sheet, tap{' '}
+          <strong>Save to Files</strong> → iCloud Drive so it survives losing the phone. Restoring
+          replaces all data on this device.
         </p>
+        <p className="settings-section__hint">{formatBackupDate(lastBackupAt)}</p>
         <button
           type="button"
           className="btn btn--primary btn--block"
@@ -201,7 +255,7 @@ export function Settings() {
         <input
           ref={fileInputRef}
           type="file"
-          accept="application/json"
+          accept="application/json,.json"
           hidden
           onChange={handleFileSelected}
         />

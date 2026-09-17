@@ -6,6 +6,12 @@ import { defineConfig } from 'vitest/config'
 // BASE_PATH is set by the GitHub Pages workflow (e.g. /raven-rx/); defaults to / locally.
 export default defineConfig({
   base: process.env.BASE_PATH ?? '/',
+  define: {
+    // Shown in Settings so you can tell which version is running on the phone.
+    __APP_VERSION__: JSON.stringify(
+      `${new Date().toISOString().slice(0, 16).replace('T', ' ')} UTC · ${process.env.GITHUB_SHA?.slice(0, 7) ?? 'local'}`,
+    ),
+  },
   test: {
     environment: 'node',
     setupFiles: ['./src/test/setup.ts'],
@@ -13,7 +19,8 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      // 'prompt': a new version waits until you tap Update, so nothing reloads mid-edit.
+      registerType: 'prompt',
       includeAssets: ['seed/medications.csv'],
       manifest: {
         name: 'Raven Rx — Pharmacy Registration & Reference',

@@ -42,6 +42,8 @@
   --tab-bar-height: 60px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-top: env(safe-area-inset-top, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
 }
 
 * {
@@ -63,6 +65,23 @@ body {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
+  /* The home-screen app draws under the iOS status bar (black-translucent),
+     so push content below the clock/battery and away from landscape notches. */
+  padding-top: var(--safe-top);
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
+}
+
+/* Opaque strip behind the status bar so scrolled content never shows through it. */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--safe-top);
+  background: var(--color-bg);
+  z-index: 400;
 }
 
 :focus-visible {

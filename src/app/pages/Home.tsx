@@ -1,7 +1,9 @@
 import { useLiveQuery } from 'dexie-react-hooks'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { dueSoon, moneyOwed, openItemsSummary, staleItems } from '../../db/repo'
 import { db } from '../../db/schema'
+import { backUpNow } from '../../ui/backupExport'
 import { daysSinceLastBackup } from '../../ui/localPrefs'
 import './pages.css'
 
@@ -14,8 +16,20 @@ export function Home() {
   const openTotal = openSummary
     ? openSummary.searching + openSummary.found + openSummary.transferred
     : 0
-  const backupAge = daysSinceLastBackup()
-  const showBackupNag = backupAge !== null && backupAge > 7
+  const hasOwnData = useLiveQuery(async () => (await db.requests.count()) > 0, [])
+  const [backupAge, setBackupAge] = useState(daysSinceLastBackup)
+  const [backingUp, setBackingUp] = useState(false)
+  const showBackupNag = hasOwnData === true && (backupAge === null || backupAge > 7)
+
+  const handleBackUpNow = async () => {
+    setBackingUp(true)
+    try {
+      await backUpNow()
+      setBackupAge(daysSinceLastBackup())
+    } finally {
+      setBackingUp(false)
+    }
+  }
 
   return (
     <div className="page">
@@ -27,7 +41,21 @@ export function Home() {
       </div>
 
       {showBackupNag && (
-        <p className="warning-banner">Last backup: {backupAge} days ago. Back up in Settings.</p>
+        <div className="warning-banner backup-nag">
+          <span>
+            {backupAge === null
+              ? 'Your data isn’t backed up yet.'
+              : `Last backup: ${backupAge} days ago.`}
+          </span>
+          <button
+            type="button"
+            className="btn btn--primary backup-nag__action"
+            disabled={backingUp}
+            onClick={handleBackUpNow}
+          >
+            {backingUp ? 'Preparing…' : 'Back up now'}
+          </button>
+        </div>
       )}
 
       <Link to="/items/owed" className="home-tile home-tile--link">

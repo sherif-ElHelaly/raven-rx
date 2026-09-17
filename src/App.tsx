@@ -20,6 +20,7 @@ import { Settings } from './app/pages/settings/Settings'
 import './app/pages/pages.css'
 import { db } from './db/schema'
 import { ensureSeeded } from './db/seedImport'
+import { AppUpdateProvider, UpdateBanner } from './ui/AppUpdate'
 import { PinLock } from './ui/PinLock'
 import { ToastProvider } from './ui/Toast'
 
@@ -31,40 +32,43 @@ function App() {
   }, [])
 
   return (
-    <PinLock>
-      <ToastProvider>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/items/:filter" element={<ItemsFiltered />} />
-          <Route path="/shopping" element={<ShoppingList />} />
+    <AppUpdateProvider>
+      <PinLock>
+        <ToastProvider>
+          <UpdateBanner />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/items/:filter" element={<ItemsFiltered />} />
+            <Route path="/shopping" element={<ShoppingList />} />
 
-          <Route path="/requests" element={<RequestsList />} />
-          <Route path="/requests/:requestId" element={<RequestDetail />} />
-          <Route path="/requests/:requestId/handover" element={<RequestHandover />} />
-          <Route path="/add" element={<NewRequest />} />
+            <Route path="/requests" element={<RequestsList />} />
+            <Route path="/requests/:requestId" element={<RequestDetail />} />
+            <Route path="/requests/:requestId/handover" element={<RequestHandover />} />
+            <Route path="/add" element={<NewRequest />} />
 
-          <Route path="/people/:personId" element={<PersonDetail />} />
+            <Route path="/people/:personId" element={<PersonDetail />} />
 
-          <Route path="/locations" element={<LocationsList />} />
-          <Route path="/locations/new" element={<LocationForm />} />
-          <Route path="/locations/:locationId/edit" element={<LocationForm />} />
+            <Route path="/locations" element={<LocationsList />} />
+            <Route path="/locations/new" element={<LocationForm />} />
+            <Route path="/locations/:locationId/edit" element={<LocationForm />} />
 
-          <Route path="/drugs" element={<ProductList />} />
-          <Route path="/drugs/new" element={<ProductForm />} />
-          <Route path="/drugs/:productId" element={<ProductDetail />} />
-          <Route path="/drugs/:productId/edit" element={<ProductForm />} />
-          <Route path="/drugs/:productId/presentations/new" element={<PresentationForm />} />
-          <Route
-            path="/drugs/:productId/presentations/:presentationId/edit"
-            element={<PresentationForm />}
-          />
+            <Route path="/drugs" element={<ProductList />} />
+            <Route path="/drugs/new" element={<ProductForm />} />
+            <Route path="/drugs/:productId" element={<ProductDetail />} />
+            <Route path="/drugs/:productId/edit" element={<ProductForm />} />
+            <Route path="/drugs/:productId/presentations/new" element={<PresentationForm />} />
+            <Route
+              path="/drugs/:productId/presentations/:presentationId/edit"
+              element={<PresentationForm />}
+            />
 
-          <Route path="/search" element={<Search />} />
-        </Routes>
-        <TabBar />
-      </ToastProvider>
-    </PinLock>
+            <Route path="/search" element={<Search />} />
+          </Routes>
+          <TabBar />
+        </ToastProvider>
+      </PinLock>
+    </AppUpdateProvider>
   )
 }
 

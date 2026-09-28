@@ -4,16 +4,20 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
   closeCase,
   deleteCase,
+  describeItems,
   markAllFound,
   restoreCase,
+  saveCaseAsRegularMeds,
   setCaseFeeRefunded,
   summarizeCase,
 } from '../../../db/cases'
-import { setItemStatus } from '../../../db/repo'
+import { addItem, removeItem, setItemQty, setItemStatus, setRegularMeds } from '../../../db/repo'
 import { db } from '../../../db/schema'
 import type { Item, ItemStatus } from '../../../db/types'
 import { personTitle } from '../../../ui/format'
 import { useToast } from '../../../ui/Toast'
+import { MedPicker } from '../drugs/MedPicker'
+import { AlternateSheet } from './AlternateSheet'
 import { ItemRow, type StatusOpts } from './ItemRow'
 import { LocationPicker } from './LocationPicker'
 import './requests.css'
@@ -38,24 +42,11 @@ export function RequestDetail() {
   const locations = useLiveQuery(() => db.locations.toArray(), [])
   const locationNames = new Map((locations ?? []).map((l) => [l.id!, l.name]))
 
-  const itemDisplay = useLiveQuery(async () => {
-    const labels = new Map<number, string>()
-    const flags = new Map<number, { fridge: boolean; controlled: boolean }>()
-    if (!items || items.length === 0) return { labels, flags }
-    const presentations = await db.presentations.bulkGet(items.map((i) => i.presentationId))
-    const presentationById = new Map(presentations.filter(Boolean).map((p) => [p!.id!, p!]))
-    const products = await db.products.bulkGet([
-      ...new Set([...presentationById.values()].map((p) => p.productId)),
-    ])
-    const productById = new Map(products.filter(Boolean).map((p) => [p!.id!, p!]))
-    for (const item of items) {
-      const pres = presentationById.get(item.presentationId)
-      const prod = pres ? productById.get(pres.productId) : undefined
-      labels.set(item.id!, [prod?.nameEn ?? 'Unknown', pres?.strength, pres?.form].filter(Boolean).join(' '))
-      flags.set(item.id!, { fridge: pres?.fridge ?? false, controlled: pres?.controlled ?? false })
-    }
-    return { labels, flags }
-  }, [items])
+  const itemDisplay = useLiveQuery(() => describeItems(db, items ?? []), [items])
+
+  const [alternateFor, setAlternateFor] = useState<number | null>(null)
+  const [editingItem, setEditingItem] = useState<number | null>(null)
+  const [addingMed, setAddingMed] = useState(false)
 
   if (request === undefined || items === undefined) return <div className="page">Loading…</div>
   if (!request) {
@@ -137,6 +128,39 @@ export function RequestDetail() {
       navigate('/requests?tab=finished', { replace: true })
     }
   }
+
+  const prescribedLabel = (item: Item) =>
+    itemDisplay?.get(item.id!)?.substituteFor ?? itemDisplay?.get(item.id!)?.label ?? 'this med'
+
+  const handleAddMed = async (presentationId: number, label: string) => {
+    setAddingMed(false)
+    const itemId = await addItem(db, id, presentationId, 1)
+    showToast(`Added ${label}`, () => {
+      db.items.delete(itemId)
+    })
+  }
+
+  const handleRemoveItem = async (itemId: number) => {
+    setEditingItem(null)
+    const removed = await removeItem(db, itemId)
+    if (removed) {
+      showToast('Med removed from case', () => {
+        db.items.put(removed)
+      })
+    }
+  }
+
+  const handleSaveRegular = async () => {
+    const previous = await saveCaseAsRegularMeds(db, id)
+    if (previous) {
+      showToast(`Saved as ${personTitle(person)}’s regular meds`, () => {
+        if (person) setRegularMeds(db, person.id!, previous)
+      })
+    }
+  }
+
+  const editing = editingItem !== null ? items.find((i) => i.id === editingItem) : undefined
+  const alternateItem = alternateFor !== null ? items.find((i) => i.id === alternateFor) : undefined
 
   const handleDelete = async () => {
     setConfirmingDelete(false)
@@ -222,14 +246,90 @@ export function RequestDetail() {
           <ItemRow
             key={item.id}
             item={item}
-            label={itemDisplay?.labels.get(item.id!) ?? '…'}
-            flags={itemDisplay?.flags.get(item.id!)}
+            display={itemDisplay?.get(item.id!)}
             locationNames={locationNames}
             onSetStatus={(status, previous, opts) => handleSetStatus(item.id!, status, previous, opts)}
+            onAlternate={() => setAlternateFor(item.id!)}
+            onEdit={() => setEditingItem(item.id!)}
           />
         ))}
       </ul>
       {items.length === 0 && <p className="empty-state">No meds in this case.</p>}
+
+      <div className="case-secondary-actions">
+        <button type="button" className="btn btn--ghost" onClick={() => setAddingMed(true)}>
+          + Add med
+        </button>
+        {items.length > 0 && person && (
+          <button type="button" className="btn btn--ghost" onClick={handleSaveRegular}>
+            Save as regular meds
+          </button>
+        )}
+      </div>
+
+      {alternateItem && (
+        <AlternateSheet
+          item={alternateItem}
+          prescribedLabel={prescribedLabel(alternateItem)}
+          onClose={() => setAlternateFor(null)}
+        />
+      )}
+
+      {addingMed && (
+        <MedPicker
+          mode="presentation"
+          title="Add to this case"
+          onClose={() => setAddingMed(false)}
+          onPick={(pres, product) =>
+            handleAddMed(pres.id!, [product.nameEn, pres.strength, pres.form].filter(Boolean).join(' '))
+          }
+        />
+      )}
+
+      {editing && (
+        <div className="sheet-backdrop" onClick={() => setEditingItem(null)}>
+          <div className="sheet" onClick={(e) => e.stopPropagation()}>
+            <div className="sheet__handle" />
+            <p className="sheet__title">{itemDisplay?.get(editing.id!)?.label ?? 'Med'}</p>
+            <div className="qty-stepper">
+              <span>Quantity</span>
+              <span className="qty-stepper__controls">
+                <button
+                  type="button"
+                  className="btn"
+                  disabled={editing.qty <= 1}
+                  onClick={() => setItemQty(db, editing.id!, editing.qty - 1)}
+                  aria-label="Less"
+                >
+                  −
+                </button>
+                <span className="qty-stepper__value">{editing.qty}</span>
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={() => setItemQty(db, editing.id!, editing.qty + 1)}
+                  aria-label="More"
+                >
+                  +
+                </button>
+              </span>
+            </div>
+            <button
+              type="button"
+              className="sheet__option sheet__option--danger"
+              onClick={() => handleRemoveItem(editing.id!)}
+            >
+              Remove from case
+              <span className="sheet__option-hint">
+                For a line added by mistake. To give up on a med, set it Unavailable instead.
+              </span>
+            </button>
+            <button type="button" className="sheet__cancel" onClick={() => setEditingItem(null)}>
+              Done
+            </button>
+          </div>
+        </div>
+      )}
 
       {!summary.finished && items.length > 0 && (
         <button

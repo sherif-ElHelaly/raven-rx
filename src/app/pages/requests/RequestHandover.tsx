@@ -1,7 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { handOverCase, summarizeCase } from '../../../db/cases'
+import { describeItems, handOverCase, summarizeCase } from '../../../db/cases'
 import { db } from '../../../db/schema'
 import { personTitle } from '../../../ui/format'
 import { useToast } from '../../../ui/Toast'
@@ -23,17 +23,8 @@ export function RequestHandover() {
   const items = useLiveQuery(() => db.items.where('requestId').equals(id).toArray(), [id])
   const labels = useLiveQuery(async () => {
     const map = new Map<number, string>()
-    if (!items || items.length === 0) return map
-    const presentations = await db.presentations.bulkGet(items.map((i) => i.presentationId))
-    const presentationById = new Map(presentations.filter(Boolean).map((p) => [p!.id!, p!]))
-    const products = await db.products.bulkGet([
-      ...new Set([...presentationById.values()].map((p) => p.productId)),
-    ])
-    const productById = new Map(products.filter(Boolean).map((p) => [p!.id!, p!]))
-    for (const item of items) {
-      const pres = presentationById.get(item.presentationId)
-      const prod = pres ? productById.get(pres.productId) : undefined
-      map.set(item.id!, [prod?.nameEn ?? 'Unknown', pres?.strength, pres?.form].filter(Boolean).join(' '))
+    for (const [itemId, d] of await describeItems(db, items ?? [])) {
+      map.set(itemId, d.substituteFor ? `${d.label} (بديل for ${d.substituteFor})` : d.label)
     }
     return map
   }, [items])

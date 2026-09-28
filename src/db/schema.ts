@@ -7,6 +7,7 @@ import type {
   Presentation,
   Product,
   ProductIngredient,
+  ProductLink,
   Request,
 } from './types'
 
@@ -19,6 +20,7 @@ export class SarfDB extends Dexie {
   ingredients!: EntityTable<Ingredient, 'id'>
   productIngredients!: EntityTable<ProductIngredient, 'id'>
   locations!: EntityTable<Location, 'id'>
+  productLinks!: EntityTable<ProductLink, 'id'>
 
   constructor(name = 'sarf') {
     super(name)
@@ -32,6 +34,9 @@ export class SarfDB extends Dexie {
       ingredients: '++id, nameEn',
       productIngredients: '++id, productId, ingredientId',
       locations: '++id, name, type',
+    })
+    this.version(2).stores({
+      productLinks: '++id, productA, productB',
     })
   }
 }

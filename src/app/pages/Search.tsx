@@ -49,10 +49,12 @@ export function Search() {
   const matchingItems =
     productIds.size === 0
       ? []
-      : (items ?? []).filter((i) => {
-          const pres = presentationById.get(i.presentationId)
-          return pres && productIds.has(pres.productId)
-        })
+      : (items ?? []).filter((i) =>
+          [i.presentationId, i.substitutedWithId].some((presId) => {
+            const pres = presId !== undefined ? presentationById.get(presId) : undefined
+            return pres && productIds.has(pres.productId)
+          }),
+        )
 
   // Matching meds are shown as their cases (one row per case), not one per med.
   const cases = useLiveQuery(() => loadCases(db), [])
@@ -67,9 +69,15 @@ export function Search() {
   const matchDetail = (requestId: number) =>
     (matchedByRequest.get(requestId) ?? [])
       .map((i) => {
-        const pres = presentationById.get(i.presentationId)
-        const name = pres ? productById.get(pres.productId)?.nameEn : undefined
-        return `${name ?? 'Unknown'}: ${STATUS_LABELS[i.status].toLowerCase()}`
+        const nameOf = (presId: number) => {
+          const pres = presentationById.get(presId)
+          return (pres ? productById.get(pres.productId)?.nameEn : undefined) ?? 'Unknown'
+        }
+        const name =
+          i.substitutedWithId !== undefined
+            ? `${nameOf(i.substitutedWithId)} (بديل for ${nameOf(i.presentationId)})`
+            : nameOf(i.presentationId)
+        return `${name}: ${STATUS_LABELS[i.status].toLowerCase()}`
       })
       .join(' · ')
 

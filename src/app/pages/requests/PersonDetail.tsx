@@ -1,13 +1,12 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { summarizeCase } from '../../../db/cases'
 import { createRenewalRequest, setRegularMeds, updatePerson } from '../../../db/repo'
 import { db } from '../../../db/schema'
 import type { Plan, RegularMed } from '../../../db/types'
-import { search } from '../../../search/searchIndex'
-import { useSearchIndex } from '../../../search/useSearchIndex'
 import { personTitle } from '../../../ui/format'
+import { MedPicker } from '../drugs/MedPicker'
 import { CaseRow } from './CaseRow'
 import './requests.css'
 
@@ -15,7 +14,6 @@ export function PersonDetail() {
   const { personId } = useParams()
   const id = Number(personId)
   const navigate = useNavigate()
-  const index = useSearchIndex()
 
   const person = useLiveQuery(() => db.people.get(id), [id])
   const requests = useLiveQuery(
@@ -49,8 +47,7 @@ export function PersonDetail() {
     }
   }, [person])
 
-  const [medQuery, setMedQuery] = useState('')
-  const medResults = medQuery.trim().length >= 2 && index ? search(index, medQuery, 8) : []
+  const [addingMed, setAddingMed] = useState(false)
 
   const [renewPlan, setRenewPlan] = useState<Plan>('monthly')
   const [renewing, setRenewing] = useState(false)
@@ -83,7 +80,6 @@ export function PersonDetail() {
     if (existing) existing.qty += 1
     else next.push({ presentationId, qty: 1 })
     setRegularMeds(db, id, next)
-    setMedQuery('')
   }
 
   const updateMedQty = (presentationId: number, qty: number) => {
@@ -182,9 +178,13 @@ export function PersonDetail() {
           const prod = pres ? productById.get(pres.productId) : undefined
           return (
             <li key={med.presentationId}>
-              <span>
-                {prod?.nameEn ?? 'Unknown'} {pres?.strength} {pres?.form} × {med.qty}
-              </span>
+              {prod ? (
+                <Link to={`/drugs/${prod.id}?pres=${med.presentationId}`} className="item-row__name">
+                  {prod.nameEn} {pres?.strength} {pres?.form} × {med.qty}
+                </Link>
+              ) : (
+                <span>Unknown × {med.qty}</span>
+              )}
               <span style={{ display: 'flex', gap: 'var(--space-2)' }}>
                 <input
                   type="number"
@@ -204,35 +204,19 @@ export function PersonDetail() {
       </ul>
       {regularMeds.length === 0 && <p className="empty-state">No regular medications set yet.</p>}
 
-      <label className="field">
-        <span className="field__label">Add regular medication</span>
-        <input
-          className="field__input"
-          value={medQuery}
-          onChange={(e) => setMedQuery(e.target.value)}
-          placeholder="Type 2-3 letters…"
+      <button type="button" className="btn btn--ghost" onClick={() => setAddingMed(true)}>
+        + Add regular medication
+      </button>
+      {addingMed && (
+        <MedPicker
+          mode="presentation"
+          title="Add regular medication"
+          onClose={() => setAddingMed(false)}
+          onPick={(pres) => {
+            setAddingMed(false)
+            addRegularMed(pres.id!)
+          }}
         />
-      </label>
-      {medResults.length > 0 && (
-        <ul className="new-request__results">
-          {medResults.map((r) => {
-            const prod = productById.get(r.productId)
-            if (!prod) return null
-            return (
-              <li key={r.productId}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const firstPres = (presentations ?? []).find((p) => p.productId === r.productId)
-                    if (firstPres) addRegularMed(firstPres.id!)
-                  }}
-                >
-                  {prod.nameEn} <span dir="rtl">{prod.nameAr}</span>
-                </button>
-              </li>
-            )
-          })}
-        </ul>
       )}
 
       <h2 className="product-detail__section-title">Renew</h2>

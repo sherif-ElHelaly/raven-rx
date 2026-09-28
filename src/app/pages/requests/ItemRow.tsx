@@ -1,5 +1,7 @@
 import { useState } from 'react'
-import { knownLocationFor } from '../../../db/cases'
+import { Link } from 'react-router-dom'
+import { type ItemDisplay, knownLocationFor } from '../../../db/cases'
+import { effectivePresentationId } from '../../../db/repo'
 import { db } from '../../../db/schema'
 import type { Item, ItemStatus, Location } from '../../../db/types'
 import { LocationPicker } from './LocationPicker'
@@ -13,10 +15,11 @@ export interface StatusOpts {
 
 interface ItemRowProps {
   item: Item
-  label: string
-  flags?: { fridge: boolean; controlled: boolean }
+  display?: ItemDisplay
   locationNames: Map<number, string>
   onSetStatus: (status: ItemStatus, previous: ItemStatus, opts?: StatusOpts) => void
+  onAlternate: () => void
+  onEdit: () => void
 }
 
 type LocatedStatus = 'found' | 'transferred'
@@ -28,7 +31,16 @@ function isLocated(status: ItemStatus): status is LocatedStatus {
 // Status is a native dropdown (the iOS picker wheel): one tap to open, one to
 // choose. Found / Transferred reuse the pharmacy this drug was last found at or
 // sent to, so the location is only asked the first time.
-export function ItemRow({ item, label, flags, locationNames, onSetStatus }: ItemRowProps) {
+export function ItemRow({
+  item,
+  display,
+  locationNames,
+  onSetStatus,
+  onAlternate,
+  onEdit,
+}: ItemRowProps) {
+  const label = display?.label ?? '…'
+  const flags = display?.flags
   const [picking, setPicking] = useState<LocatedStatus | null>(null)
   const [slipFor, setSlipFor] = useState<Location | null>(null)
 
@@ -44,7 +56,7 @@ export function ItemRow({ item, label, flags, locationNames, onSetStatus }: Item
     const remembered =
       status === 'found' && item.status === 'transferred' && item.transferToLocationId != null
         ? item.transferToLocationId
-        : await knownLocationFor(db, item.presentationId, status)
+        : await knownLocationFor(db, effectivePresentationId(item), status)
     if (remembered != null) apply(status, { locationId: remembered })
     else setPicking(status)
   }
@@ -72,10 +84,22 @@ export function ItemRow({ item, label, flags, locationNames, onSetStatus }: Item
     <li className="item-row">
       <div className="item-row__main">
         <span className="item-row__label">
-          {label}
+          {display?.productId !== undefined ? (
+            <Link
+              to={`/drugs/${display.productId}?pres=${display.presentationId}`}
+              className="item-row__name"
+            >
+              {label}
+            </Link>
+          ) : (
+            label
+          )}
           {flags?.fridge && <span aria-label="requires fridge"> ❄️</span>}
           {flags?.controlled && <span aria-label="controlled drug"> ⚠️</span>}
           <span className="item-row__qty"> ×{item.qty}</span>
+          {display?.substituteFor && (
+            <span className="item-row__prescribed">بديل · instead of {display.substituteFor}</span>
+          )}
         </span>
         <label className={`status-select item-row__status--${item.status}`}>
           <span className="visually-hidden">Status of {label}</span>
@@ -89,20 +113,30 @@ export function ItemRow({ item, label, flags, locationNames, onSetStatus }: Item
         </label>
       </div>
 
-      {isLocated(item.status) && (
-        <button
-          type="button"
-          className="item-row__location"
-          onClick={() => setPicking(item.status as LocatedStatus)}
-        >
-          {locationName
-            ? `${item.status === 'transferred' ? 'to' : 'at'} ${locationName} · change`
-            : `Set ${item.status === 'transferred' ? 'destination' : 'pharmacy'}`}
+      <div className="item-row__actions">
+        {isLocated(item.status) && (
+          <button
+            type="button"
+            className="item-row__location"
+            onClick={() => setPicking(item.status as LocatedStatus)}
+          >
+            {locationName
+              ? `${item.status === 'transferred' ? 'to' : 'at'} ${locationName} · change`
+              : `Set ${item.status === 'transferred' ? 'destination' : 'pharmacy'}`}
+          </button>
+        )}
+        {item.status === 'delivered' && locationName && (
+          <span className="item-row__location item-row__location--static">from {locationName}</span>
+        )}
+        {item.status !== 'cancelled' && (
+          <button type="button" className="item-row__action" onClick={onAlternate}>
+            ⇄ {item.substitutedWithId !== undefined ? 'change بديل' : 'got بديل'}
+          </button>
+        )}
+        <button type="button" className="item-row__action" onClick={onEdit}>
+          Edit
         </button>
-      )}
-      {item.status === 'delivered' && locationName && (
-        <span className="item-row__location item-row__location--static">from {locationName}</span>
-      )}
+      </div>
 
       {picking && (
         <LocationPicker

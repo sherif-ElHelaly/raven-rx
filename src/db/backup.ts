@@ -9,6 +9,7 @@ import type {
   Presentation,
   Product,
   ProductIngredient,
+  ProductLink,
   Request,
 } from './types'
 
@@ -28,6 +29,8 @@ export interface BackupData {
   ingredients: Ingredient[]
   productIngredients: ProductIngredient[]
   locations: Location[]
+  // Absent in backups made before بديل links existed.
+  productLinks?: ProductLink[]
 }
 
 // btoa/atob (not Buffer, which doesn't exist in the browser bundle) so this
@@ -75,17 +78,27 @@ function deserializePhoto<T extends { photo?: SerializedPhoto }>(
 }
 
 export async function exportBackup(db: SarfDB): Promise<BackupData> {
-  const [people, requests, items, products, presentations, ingredients, productIngredients, locations] =
-    await Promise.all([
-      db.people.toArray(),
-      db.requests.toArray(),
-      db.items.toArray(),
-      db.products.toArray(),
-      db.presentations.toArray(),
-      db.ingredients.toArray(),
-      db.productIngredients.toArray(),
-      db.locations.toArray(),
-    ])
+  const [
+    people,
+    requests,
+    items,
+    products,
+    presentations,
+    ingredients,
+    productIngredients,
+    locations,
+    productLinks,
+  ] = await Promise.all([
+    db.people.toArray(),
+    db.requests.toArray(),
+    db.items.toArray(),
+    db.products.toArray(),
+    db.presentations.toArray(),
+    db.ingredients.toArray(),
+    db.productIngredients.toArray(),
+    db.locations.toArray(),
+    db.productLinks.toArray(),
+  ])
 
   return {
     version: BACKUP_VERSION,
@@ -98,6 +111,7 @@ export async function exportBackup(db: SarfDB): Promise<BackupData> {
     ingredients,
     productIngredients,
     locations,
+    productLinks,
   }
 }
 
@@ -117,6 +131,7 @@ export async function importBackup(db: SarfDB, data: BackupData): Promise<void> 
       db.ingredients,
       db.productIngredients,
       db.locations,
+      db.productLinks,
     ],
     async () => {
       await Promise.all([
@@ -128,6 +143,7 @@ export async function importBackup(db: SarfDB, data: BackupData): Promise<void> 
         db.ingredients.clear(),
         db.productIngredients.clear(),
         db.locations.clear(),
+        db.productLinks.clear(),
       ])
 
       await Promise.all([
@@ -139,6 +155,7 @@ export async function importBackup(db: SarfDB, data: BackupData): Promise<void> 
         db.ingredients.bulkPut(data.ingredients),
         db.productIngredients.bulkPut(data.productIngredients),
         db.locations.bulkPut(data.locations),
+        db.productLinks.bulkPut(data.productLinks ?? []),
       ])
     },
   )

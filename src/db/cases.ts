@@ -1,9 +1,15 @@
 // Case-level view of the tracker. A "case" is one Request with all of its meds
 // (Items): money, progress and finished-ness are decided per case, never per med.
 
-import { CLOSED_STATUSES, knownLocationsByProduct, OPEN_STATUSES, setItemStatus } from './repo'
+import {
+  CLOSED_STATUSES,
+  effectivePresentationId,
+  knownLocationsByProduct,
+  OPEN_STATUSES,
+  setItemStatus,
+} from './repo'
 import type { SarfDB } from './schema'
-import type { Item, ItemStatus, Person, Request } from './types'
+import type { Item, ItemStatus, Person, Presentation, Product, RegularMed, Request } from './types'
 
 const DAY_MS = 24 * 60 * 60 * 1000
 
@@ -214,14 +220,14 @@ export async function knownLocationFor(
 export async function markAllFound(db: SarfDB, requestId: number): Promise<number[]> {
   const items = await db.items.where('requestId').equals(requestId).toArray()
   const known = await knownLocationsByProduct(db)
-  const presentations = await db.presentations.bulkGet(items.map((i) => i.presentationId))
+  const presentations = await db.presentations.bulkGet(items.map(effectivePresentationId))
   const productByPresentation = new Map<number, number>()
   for (const p of presentations) if (p) productByPresentation.set(p.id!, p.productId)
 
   const unknown: number[] = []
   for (const item of items) {
     if (item.status !== 'searching' && item.status !== 'transferred') continue
-    const productId = productByPresentation.get(item.presentationId)
+    const productId = productByPresentation.get(effectivePresentationId(item))
     const locationId =
       item.status === 'transferred' && item.transferToLocationId != null
         ? item.transferToLocationId
@@ -232,6 +238,75 @@ export async function markAllFound(db: SarfDB, requestId: number): Promise<numbe
     else await setItemStatus(db, item.id!, 'found', { locationId })
   }
   return unknown
+}
+
+export function presentationLabel(
+  product: Product | undefined,
+  pres: Presentation | undefined,
+): string {
+  return [product?.nameEn ?? 'Unknown', pres?.strength, pres?.form].filter(Boolean).join(' ')
+}
+
+export interface ItemDisplay {
+  // What is shown: the بديل when one was taken, else the prescribed med.
+  label: string
+  // The prescribed med's label, only when a بديل was taken.
+  substituteFor?: string
+  productId?: number
+  presentationId: number
+  flags: { fridge: boolean; controlled: boolean }
+}
+
+// Display info for a case's meds, keyed by item id.
+export async function describeItems(db: SarfDB, items: Item[]): Promise<Map<number, ItemDisplay>> {
+  const result = new Map<number, ItemDisplay>()
+  if (items.length === 0) return result
+  const presIds = [...new Set(items.flatMap((i) => [i.presentationId, effectivePresentationId(i)]))]
+  const presentations = await db.presentations.bulkGet(presIds)
+  const presentationById = new Map(presentations.filter(Boolean).map((p) => [p!.id!, p!]))
+  const products = await db.products.bulkGet([
+    ...new Set([...presentationById.values()].map((p) => p.productId)),
+  ])
+  const productById = new Map(products.filter(Boolean).map((p) => [p!.id!, p!]))
+  const labelOf = (presId: number) => {
+    const pres = presentationById.get(presId)
+    return { pres, product: pres ? productById.get(pres.productId) : undefined }
+  }
+  for (const item of items) {
+    const shownId = effectivePresentationId(item)
+    const shown = labelOf(shownId)
+    result.set(item.id!, {
+      label: presentationLabel(shown.product, shown.pres),
+      substituteFor:
+        item.substitutedWithId !== undefined
+          ? presentationLabel(labelOf(item.presentationId).product, labelOf(item.presentationId).pres)
+          : undefined,
+      productId: shown.pres?.productId,
+      presentationId: shownId,
+      flags: { fridge: shown.pres?.fridge ?? false, controlled: shown.pres?.controlled ?? false },
+    })
+  }
+  return result
+}
+
+// Makes a case's meds the person's regular meds (what Renew copies). Uses the
+// prescribed meds, not بديل, since the prescription is written by name.
+export async function saveCaseAsRegularMeds(db: SarfDB, requestId: number): Promise<RegularMed[] | null> {
+  const request = await db.requests.get(requestId)
+  if (!request) return null
+  const person = await db.people.get(request.personId)
+  if (!person) return null
+  const previous = person.regularMeds ?? []
+  const items = await db.items.where('requestId').equals(requestId).toArray()
+  const meds = new Map<number, number>()
+  for (const i of items) {
+    if (i.status === 'cancelled') continue
+    meds.set(i.presentationId, (meds.get(i.presentationId) ?? 0) + i.qty)
+  }
+  await db.people.update(person.id!, {
+    regularMeds: [...meds].map(([presentationId, qty]) => ({ presentationId, qty })),
+  })
+  return previous
 }
 
 export interface DeletedCase {

@@ -13,6 +13,7 @@ import type {
   Plan,
   Presentation,
   Product,
+  ProductLink,
   RegularMed,
   Request,
   StatusHistoryEntry,
@@ -217,6 +218,13 @@ export async function hasOpenDuplicate(
   )
 }
 
+// The presentation that was (or is being) actually obtained: the بديل when
+// one was recorded, otherwise the prescribed med. Where it was found, the
+// shopping list and "last found where" all follow this one.
+export function effectivePresentationId(item: Pick<Item, 'presentationId' | 'substitutedWithId'>): number {
+  return item.substitutedWithId ?? item.presentationId
+}
+
 export async function addItem(
   db: SarfDB,
   requestId: number,
@@ -279,12 +287,107 @@ export async function setItemStatus(
   await db.items.update(itemId, patch)
 }
 
+export async function setItemQty(db: SarfDB, itemId: number, qty: number): Promise<void> {
+  await db.items.update(itemId, { qty: Math.max(1, Math.round(qty)) })
+}
+
+// Removes one med line from a case (e.g. a misread scan line). Returns the
+// removed item so it can be put back with db.items.put().
+export async function removeItem(db: SarfDB, itemId: number): Promise<Item | undefined> {
+  const item = await db.items.get(itemId)
+  if (item) await db.items.delete(itemId)
+  return item
+}
+
+// ---------------------------------------------------------------------------
+// بديل links — hand-made alternates between products.
+// ---------------------------------------------------------------------------
+
+function linkPair(a: number, b: number): [number, number] {
+  return a < b ? [a, b] : [b, a]
+}
+
+export async function findLink(db: SarfDB, a: number, b: number) {
+  const [productA, productB] = linkPair(a, b)
+  return db.productLinks
+    .where('productA')
+    .equals(productA)
+    .filter((l) => l.productB === productB)
+    .first()
+}
+
+// Links two products as بديل of each other. Returns the new link's id, or
+// null when they were already linked (or are the same product).
+export async function linkProducts(
+  db: SarfDB,
+  a: number,
+  b: number,
+  source: ProductLink['source'] = 'manual',
+): Promise<number | null> {
+  if (a === b) return null
+  if (await findLink(db, a, b)) return null
+  const [productA, productB] = linkPair(a, b)
+  return addEntity(db.productLinks.add({ productA, productB, createdAt: Date.now(), source }))
+}
+
+export async function unlinkProducts(db: SarfDB, a: number, b: number): Promise<void> {
+  const link = await findLink(db, a, b)
+  if (link) await db.productLinks.delete(link.id!)
+}
+
+export async function linkedProductIds(db: SarfDB, productId: number): Promise<number[]> {
+  const [asA, asB] = await Promise.all([
+    db.productLinks.where('productA').equals(productId).toArray(),
+    db.productLinks.where('productB').equals(productId).toArray(),
+  ])
+  return [...asA.map((l) => l.productB), ...asB.map((l) => l.productA)]
+}
+
+export interface SubstituteResult {
+  previous: number | undefined
+  // A link learned from this substitution; undo removes it again.
+  createdLinkId: number | null
+}
+
+// Records that a بديل (`substitutePresentationId`) was obtained instead of the
+// prescribed med, or clears it with null. A بديل from a different product
+// links the two products so it's suggested next time.
+export async function substituteItem(
+  db: SarfDB,
+  itemId: number,
+  substitutePresentationId: number | null,
+): Promise<SubstituteResult> {
+  const item = await db.items.get(itemId)
+  if (!item) throw new Error(`Item ${itemId} not found`)
+  const previous = item.substitutedWithId
+  const next =
+    substitutePresentationId === null || substitutePresentationId === item.presentationId
+      ? undefined
+      : substitutePresentationId
+  await db.items.update(itemId, { substitutedWithId: next })
+
+  let createdLinkId: number | null = null
+  if (next !== undefined) {
+    const [original, substitute] = await db.presentations.bulkGet([item.presentationId, next])
+    if (original && substitute) {
+      createdLinkId = await linkProducts(db, original.productId, substitute.productId, 'substitution')
+    }
+  }
+  return { previous, createdLinkId }
+}
+
+export async function undoSubstitute(db: SarfDB, itemId: number, result: SubstituteResult): Promise<void> {
+  await db.items.update(itemId, { substitutedWithId: result.previous })
+  if (result.createdLinkId !== null) await db.productLinks.delete(result.createdLinkId)
+}
+
 // ---------------------------------------------------------------------------
 // Alternatives (بديل) — VISION §5.1. Combination products match the whole
 // ingredient set, so Co-Tareg never shows as exact/close for Tareg.
 // ---------------------------------------------------------------------------
 
-export type AlternativeTier = 'exact' | 'close' | 'class'
+// 'linked' = a hand-made (or learned) بديل link, see linkProducts().
+export type AlternativeTier = 'exact' | 'close' | 'linked' | 'class'
 
 export interface AlternativeItem {
   tier: AlternativeTier
@@ -352,6 +455,17 @@ export async function getAlternatives(
     }
   }
 
+  // 🔗 linked by hand — works for scanned meds with no known ingredients.
+  for (const otherId of await linkedProductIds(db, product.id!)) {
+    if (matchedProductIds.has(otherId)) continue
+    const other = allProducts.find((p) => p.id === otherId)
+    if (!other) continue
+    matchedProductIds.add(otherId)
+    for (const pres of presentationsByProductId.get(otherId) ?? []) {
+      results.push({ tier: 'linked', product: other, presentation: pres })
+    }
+  }
+
   // 🔴 same drug class only: therapeutic alternative, needs prescriber
   // approval. Only meaningful for single-ingredient products — a
   // combination's "class" isn't well-defined by one ingredient.
@@ -373,9 +487,14 @@ export async function getAlternatives(
     }
   }
 
-  const tierOrder: Record<AlternativeTier, number> = { exact: 0, close: 1, class: 2 }
+  const tierOrder: Record<AlternativeTier, number> = { exact: 0, close: 1, linked: 2, class: 3 }
+  const samePresentation = (p: Presentation) =>
+    p.strength === presentation.strength && p.form === presentation.form ? 0 : 1
   results.sort(
-    (a, b) => tierOrder[a.tier] - tierOrder[b.tier] || a.product.nameEn.localeCompare(b.product.nameEn),
+    (a, b) =>
+      tierOrder[a.tier] - tierOrder[b.tier] ||
+      samePresentation(a.presentation) - samePresentation(b.presentation) ||
+      a.product.nameEn.localeCompare(b.product.nameEn),
   )
   return results
 }
@@ -398,7 +517,7 @@ export async function lastFoundWhere(db: SarfDB, productId: number): Promise<Las
 
   const delivered = await db.items.where('status').equals('delivered').toArray()
   const relevant = delivered.filter(
-    (i) => presentationIds.has(i.presentationId) && i.foundAtLocationId != null,
+    (i) => presentationIds.has(effectivePresentationId(i)) && i.foundAtLocationId != null,
   )
   if (relevant.length === 0) return null
 
@@ -522,6 +641,8 @@ export interface ShoppingLine {
   presentationId: number
   productName: string
   presentationLabel: string
+  // Set when this line is a بديل: the prescribed med's name.
+  substituteFor?: string
   qty: number
   itemIds: number[]
 }
@@ -530,7 +651,9 @@ export async function shoppingList(db: SarfDB): Promise<ShoppingLine[]> {
   const items = await db.items.where('status').anyOf(['searching', 'transferred']).toArray()
   if (items.length === 0) return []
 
-  const presentationIds = [...new Set(items.map((i) => i.presentationId))]
+  const presentationIds = [
+    ...new Set(items.flatMap((i) => [i.presentationId, effectivePresentationId(i)])),
+  ]
   const presentations = await db.presentations.bulkGet(presentationIds)
   const presentationById = new Map(
     presentations.filter((p): p is Presentation => !!p).map((p) => [p.id!, p]),
@@ -543,7 +666,7 @@ export async function shoppingList(db: SarfDB): Promise<ShoppingLine[]> {
   const known = await knownLocationsByProduct(db)
   const targetLocation = (item: Item): number | undefined => {
     if (item.status === 'transferred') return item.transferToLocationId
-    const productId = presentationById.get(item.presentationId)?.productId
+    const productId = presentationById.get(effectivePresentationId(item))?.productId
     return productId !== undefined ? known.get(productId)?.foundAt : undefined
   }
   const locationIds = [
@@ -560,9 +683,11 @@ export async function shoppingList(db: SarfDB): Promise<ShoppingLine[]> {
       locationId != null
         ? (locationById.get(locationId)?.name ?? 'Unknown location')
         : 'Hospital pharmacies'
-    const key = `${groupKey}:${item.presentationId}`
-    const pres = presentationById.get(item.presentationId)
+    const presentationId = effectivePresentationId(item)
+    const key = `${groupKey}:${presentationId}:${item.presentationId}`
+    const pres = presentationById.get(presentationId)
     const prod = pres ? productById.get(pres.productId) : undefined
+    const prescribed = presentationById.get(item.presentationId)
 
     const existing = lineByKey.get(key)
     if (existing) {
@@ -573,9 +698,13 @@ export async function shoppingList(db: SarfDB): Promise<ShoppingLine[]> {
         groupKey,
         groupLabel,
         locationId,
-        presentationId: item.presentationId,
+        presentationId,
         productName: prod?.nameEn ?? 'Unknown',
         presentationLabel: [pres?.strength, pres?.form].filter(Boolean).join(' '),
+        substituteFor:
+          item.substitutedWithId !== undefined
+            ? (prescribed ? productById.get(prescribed.productId)?.nameEn : undefined) ?? 'Unknown'
+            : undefined,
         qty: item.qty,
         itemIds: [item.id!],
       })
@@ -606,7 +735,7 @@ export async function knownLocationsByProduct(db: SarfDB): Promise<Map<number, K
   const latest = new Map<number, { found?: [number, number]; transfer?: [number, number] }>()
 
   for (const item of items) {
-    const productId = productByPresentation.get(item.presentationId)
+    const productId = productByPresentation.get(effectivePresentationId(item))
     if (productId === undefined) continue
     const entry = latest.get(productId) ?? {}
     for (const h of item.statusHistory) {

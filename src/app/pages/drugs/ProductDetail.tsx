@@ -1,27 +1,49 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useRef, useState } from 'react'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { db } from '../../../db/schema'
 import {
-  type AlternativeItem,
+  findLink,
   getAlternatives,
   getIngredientNamesForProduct,
   lastFoundWhere,
+  linkedProductIds,
+  linkProducts,
 } from '../../../db/repo'
+import type { Product } from '../../../db/types'
 import { BlobImage } from '../../../ui/BlobImage'
+import { useToast } from '../../../ui/Toast'
+import { MedPicker } from './MedPicker'
+import { TIER_LABELS } from './tiers'
 import './drugs.css'
-
-const TIER_LABELS: Record<AlternativeItem['tier'], string> = {
-  exact: '🟢 Exact',
-  close: '🟡 Close',
-  class: '🔴 Same class — needs prescriber approval',
-}
 
 export function ProductDetail() {
   const { productId } = useParams()
   const id = Number(productId)
   const navigate = useNavigate()
-  const [openAlternativesFor, setOpenAlternativesFor] = useState<number | null>(null)
+  const { showToast } = useToast()
+  // ?pres= opens on one strength (e.g. tapped from a case) with its بديل shown.
+  const [params] = useSearchParams()
+  const focusPres = params.get('pres') ? Number(params.get('pres')) : null
+  const [openAlternativesFor, setOpenAlternativesFor] = useState<number | null>(focusPres)
+  const [linking, setLinking] = useState(false)
+  const scrolledTo = useRef<number | null>(null)
+
+  // Navigating between meds reuses this component, so re-apply ?pres= then.
+  const focusKey = `${id}:${focusPres}`
+  const [appliedFocusKey, setAppliedFocusKey] = useState(focusKey)
+  if (appliedFocusKey !== focusKey) {
+    setAppliedFocusKey(focusKey)
+    setOpenAlternativesFor(focusPres)
+  }
+
+  const linked = useLiveQuery(async () => {
+    const ids = await linkedProductIds(db, id)
+    const products = await db.products.bulkGet(ids)
+    return products
+      .filter((p): p is Product => !!p)
+      .sort((a, b) => a.nameEn.localeCompare(b.nameEn))
+  }, [id])
 
   const product = useLiveQuery(() => db.products.get(id), [id])
   const presentations = useLiveQuery(
@@ -43,6 +65,24 @@ export function ProductDetail() {
         <p className="empty-state">Medication not found.</p>
       </div>
     )
+  }
+
+  const handleLink = async (other: Product) => {
+    setLinking(false)
+    const linkId = await linkProducts(db, id, other.id!)
+    showToast(
+      linkId === null ? `${other.nameEn} is already a بديل` : `Linked ${other.nameEn} as بديل`,
+      linkId === null ? undefined : () => db.productLinks.delete(linkId),
+    )
+  }
+
+  const handleUnlink = async (other: Product) => {
+    const link = await findLink(db, id, other.id!)
+    if (!link) return
+    await db.productLinks.delete(link.id!)
+    showToast(`Unlinked ${other.nameEn}`, () => {
+      db.productLinks.put(link)
+    })
   }
 
   return (
@@ -114,7 +154,20 @@ export function ProductDetail() {
 
         <ul className="presentation-list">
           {presentations?.map((pres) => (
-            <li key={pres.id} className="presentation-list__entry">
+            <li
+              key={pres.id}
+              className={`presentation-list__entry${pres.id === focusPres ? ' presentation-list__entry--focus' : ''}`}
+              ref={
+                pres.id === focusPres
+                  ? (el) => {
+                      if (el && scrolledTo.current !== focusPres) {
+                        scrolledTo.current = focusPres
+                        el.scrollIntoView({ block: 'center' })
+                      }
+                    }
+                  : undefined
+              }
+            >
               <div className="presentation-list__row">
                 <BlobImage
                   blob={pres.photo ?? product.photo}
@@ -179,7 +232,53 @@ export function ProductDetail() {
             </li>
           ))}
         </ul>
+
+        <div className="product-detail__section-head">
+          <h2 className="product-detail__section-title">بديل linked by you</h2>
+          <button type="button" className="btn btn--ghost" onClick={() => setLinking(true)}>
+            + Link
+          </button>
+        </div>
+        {linked && linked.length === 0 && (
+          <p className="empty-state">
+            None yet. Link a med you know can replace this one — it then shows under بديل, and in
+            cases when you record one.
+          </p>
+        )}
+        <ul className="linked-list">
+          {linked?.map((other) => (
+            <li key={other.id} className="linked-list__item">
+              <Link to={`/drugs/${other.id}`} className="linked-list__name">
+                {other.nameEn}
+                {other.nameAr !== other.nameEn && (
+                  <span className="linked-list__ar" dir="rtl">
+                    {' '}
+                    {other.nameAr}
+                  </span>
+                )}
+              </Link>
+              <button
+                type="button"
+                className="btn btn--ghost linked-list__remove"
+                onClick={() => handleUnlink(other)}
+                aria-label={`Unlink ${other.nameEn}`}
+              >
+                Unlink
+              </button>
+            </li>
+          ))}
+        </ul>
       </div>
+
+      {linking && (
+        <MedPicker
+          mode="product"
+          title={`Link a بديل for ${product.nameEn}`}
+          excludeProductIds={[id, ...(linked ?? []).map((p) => p.id!)]}
+          onClose={() => setLinking(false)}
+          onPick={handleLink}
+        />
+      )}
     </div>
   )
 }

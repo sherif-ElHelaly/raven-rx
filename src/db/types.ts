@@ -147,6 +147,8 @@ export interface Item {
   requestId: number
   presentationId: number
   qty: number
+  // The presentation actually obtained when a بديل was taken instead of the
+  // prescribed one. See effectivePresentationId().
   substitutedWithId?: number
   status: ItemStatus
   foundAtLocationId?: number
@@ -197,6 +199,18 @@ export interface ProductIngredient {
   id?: number
   productId: number
   ingredientId: number
+}
+
+// A hand-made بديل link between two products, for meds whose ingredients
+// aren't known (e.g. scanned ones) or that you simply know are swappable.
+// Undirected: stored with productA < productB.
+export interface ProductLink {
+  id?: number
+  productA: number
+  productB: number
+  createdAt: number
+  // 'substitution' = learned when a بديل was recorded in a case.
+  source: 'manual' | 'substitution'
 }
 
 export interface Location {

@@ -83,17 +83,31 @@ export function ShoppingList() {
               {visibleLines
                 .filter((l) => l.groupKey === key)
                 .map((line) => (
-                  <li key={`${line.groupKey}-${line.presentationId}`}>
+                  <li key={`${line.groupKey}-${line.presentationId}-${line.itemIds[0]}`}>
                     <span>
                       {line.productName} {line.presentationLabel} × {line.qty}
+                      {line.substituteFor && (
+                        <span className="item-row__prescribed">بديل for {line.substituteFor}</span>
+                      )}
                     </span>
-                    <button
-                      type="button"
-                      className="btn btn--ghost"
-                      onClick={() => handleTapFound(line)}
-                    >
-                      Found
-                    </button>
+                    <span className="shopping-line__actions">
+                      <button
+                        type="button"
+                        className="btn btn--ghost"
+                        onClick={() => handleTapFound(line)}
+                      >
+                        {line.locationId ? 'Found here' : 'Found'}
+                      </button>
+                      {line.locationId && (
+                        <button
+                          type="button"
+                          className="item-row__action"
+                          onClick={() => setPendingLine(line)}
+                        >
+                          elsewhere…
+                        </button>
+                      )}
+                    </span>
                   </li>
                 ))}
             </ul>
@@ -101,7 +115,9 @@ export function ShoppingList() {
         ))}
 
       {locations && locations.length === 0 && lines && lines.length > 0 && (
-        <p className="empty-state">Add locations in Settings to mark items found.</p>
+        <p className="empty-state">
+          Add pharmacies under Home → Manage locations to mark items found.
+        </p>
       )}
 
       {pendingLine && (

@@ -17,6 +17,13 @@ function looseKey(name: string): string {
 }
 
 export function matchProduct(name: string, products: Product[]): Product | undefined {
+  const found = matchName(name, products)
+  if (found) return found
+  // A table border beside the name often reads as a leading ا/أ ("أسينيمت").
+  return /^[اأإ]/.test(name) ? matchName(name.slice(1), products) : undefined
+}
+
+function matchName(name: string, products: Product[]): Product | undefined {
   const key = matchKey(name)
   if (key.length < 3) return undefined
   const loose = looseKey(name)

@@ -542,7 +542,11 @@ export function ScanCase() {
                       <div className="scan-row__foot">
                         <label className="field scan-row__qty">
                           <span className="field__label">
-                            {r.qtySource === 'sheet' ? 'Qty · from sheet' : `Qty · estimated${r.perDay ? ` (${r.perDay}/day)` : ''}`}
+                            {r.qtySource === 'sheet'
+                              ? 'Qty · from sheet'
+                              : r.perDay
+                                ? `Qty · estimated (${r.perDay}/day)`
+                                : 'Qty · not read — check'}
                           </span>
                           <input
                             className="field__input"

@@ -16,6 +16,10 @@ export interface ParsedMed {
   line: string
   // Index of the source line in the OCR text (links it to its الكمية cell).
   lineIndex: number
+  // Which form the line came from: case sheet or pharmacy ticket.
+  layout: 'sheet' | 'ticket'
+  // Ticket rows: a Latin quantity after the med text ("… اقراص | 20"), if OCR kept it.
+  qtyInLine?: number
 }
 
 export interface ParsedCase {
@@ -88,42 +92,86 @@ function cleanStrength(s: string): string | undefined {
   return s
 }
 
-function parseMedLine(raw: string, lineIndex: number): ParsedMed | undefined {
-  const line = toLatinDigits(raw)
-  const words = line.split(/\s+/).filter(Boolean)
-  const formIdx = words.findIndex((w) => formFor(w))
-  if (formIdx < 0) return undefined
-  const form = formFor(words[formIdx]!)!
+const UNIT = /^(مجم|مم|مل|جم|ملجم|ميكروجرام)$/
+// Numbers as OCR returns them: digits with / . , + and stray marks.
+const NUMBERISH = /^[.+]?[0-9][0-9./,+]*[.]?$/
+// Long words that appear on the forms but are never drug names.
+const NOT_A_DRUG = /^(ال[اإ]جمالي|المستخدم|الطبيب|طبيب|العياده|العيادة|عياده|عيادة|الصيدليه|الصيدلية|المريض|التذكره|التذكرة|الحاجه|الحاجة|القلب|المطلوبه|المطلوبة|المنصرفه|المنصرفة|الكميه|الكمية|الدواء|الخارجيه|الخارجية|استقبال|توقيع)$/
 
-  const nameWords: string[] = []
-  let i = formIdx + 1
-  for (; i < words.length; i++) {
-    const w = words[i]!
-    if (!ARABIC_WORD.test(w) || NAME_STOP.test(w) || MODIFIER_WORDS[w] || RELEASE_SUFFIX.test(w)) break
-    nameWords.push(w)
-  }
-  if (nameWords.length === 0 || nameWords.join('').length < 3) return undefined
+const isNameWord = (w: string) => ARABIC_WORD.test(w) && !NAME_STOP.test(w) && !formFor(w) && !NOT_A_DRUG.test(w)
 
+// Strength/modifier/per-day details that follow the name.
+function details(words: string[], from: number) {
   let modifier: string | undefined
   let strength: string | undefined
-  for (let j = i; j < Math.min(words.length, i + 6); j++) {
+  for (let j = from; j < Math.min(words.length, from + 6); j++) {
     const w = words[j]!
     const letter = MODIFIER_WORDS[w]
     if (letter && RELEASE_SUFFIX.test(words[j + 1] ?? '')) modifier = `${letter}R`
     const num = w.match(/^[0-9]+(?:[./][0-9]+)*/)
     if (!strength && num) strength = cleanStrength(num[0].replace(/\.$/, ''))
-    if (NAME_STOP.test(w) && !/^(مجم|مم|مل|جم|ملجم|ميكروجرام)$/.test(w)) break
+    if (NAME_STOP.test(w) && !UNIT.test(w)) break
+    if (UNIT.test(w)) break
+  }
+  return { modifier, strength }
+}
+
+// Two layouts:
+// - Case sheet (المرتبات العلاجية): "١ اقراص لانوكسين ٠,٢٥ مجم اقراص مرة فى اليوم…"
+// - Pharmacy ticket (تذكرة طبية): "١ سينيمت ٢٥٠/٢٥ مجم اقراص  20"
+function parseMedLine(raw: string, lineIndex: number): ParsedMed | undefined {
+  const line = toLatinDigits(raw)
+  const words = line.split(/\s+/).filter(Boolean)
+  const base = { perDay: parsePerDay(line), line: raw.trim(), lineIndex }
+
+  // Case sheet: form word, then the name, then a number/unit/modifier/dosing word.
+  const formIdx = words.findIndex((w) => formFor(w))
+  if (formIdx >= 0) {
+    const nameWords: string[] = []
+    let i = formIdx + 1
+    for (; i < words.length && isNameWord(words[i]!) && !MODIFIER_WORDS[words[i]!] && !RELEASE_SUFFIX.test(words[i]!); i++) {
+      nameWords.push(words[i]!)
+    }
+    const next = words[i] ?? ''
+    // A number (OCR turns ٥ into ©, ٠ into +), a unit or dosing word, or a modifier.
+    const endsWell = /^[0-9]/.test(next) || (next !== '' && !/[ء-ي]/.test(next)) || NAME_STOP.test(next) || !!MODIFIER_WORDS[next]
+    if (nameWords.join('').length >= 3 && endsWell) {
+      return { name: nameWords.join(' '), ...details(words, i), form: formFor(words[formIdx]!)!, layout: 'sheet', ...base }
+    }
   }
 
-  return {
-    name: nameWords.join(' '),
-    modifier,
-    strength,
-    form,
-    perDay: parsePerDay(line),
-    line: raw.trim(),
-    lineIndex,
+  // Ticket: a name word followed (through strength numbers) by a unit or form
+  // word, or a row serial followed by a long name word.
+  for (let i = 0; i < words.length; i++) {
+    const w = words[i]!
+    if (!isNameWord(w) || w.replace(/-/g, '').length < 4) continue
+    let j = i + 1
+    while (j < words.length && NUMBERISH.test(words[j]!)) j++
+    const next = words[j] ?? ''
+    // What follows a drug name: a unit or form ("مجم", "اقراص"), a unit glued to
+    // its number ("10.مم"), a release modifier ("اكس آر"), or dosing ("مرة", "كل").
+    const unitFollows =
+      j < words.length &&
+      j <= i + 3 &&
+      // A bare unit/form needs a strength before it: "النضعة مم", "الاج جل" are header noise.
+      (((UNIT.test(next) || !!formFor(next)) && j > i + 1) ||
+        /^[0-9][0-9.,/]*(مجم|مم|مل|جم)$/.test(next) ||
+        (!!MODIFIER_WORDS[next] && RELEASE_SUFFIX.test(words[j + 1] ?? '')) ||
+        /^(مر[ةه]|مرتين|كل)$/.test(next))
+    // (Without a unit to vouch for it, an ال- word is a form label, not a brand.)
+    const serialBefore =
+      i > 0 && words.slice(0, i).every((x) => /^[0-9]{1,2}$/.test(x)) && w.length >= 5 && !w.startsWith('ال')
+    if (!unitFollows && !serialBefore) continue
+    const form = words.slice(i).map((x) => formFor(x)).find(Boolean) ?? 'tablet'
+    // Latin digits only (the raw line): Arabic-Indic numbers there are the strength.
+    const unitAt = words.findIndex((x, k) => k > i && (UNIT.test(x) || !!formFor(x)))
+    const tail = unitAt > 0 ? raw.split(/\s+/).slice(unitAt + 1).join(' ') : ''
+    // First number after the med text is المطلوبة (the next one is المنصرفة).
+    // Borders stick to it as "1.20", "#20", "|20".
+    const qtyInLine = Number(tail.match(/(?:^|[\s|#.])([1-9][0-9]{0,2})(?=\s|$|[\]|])/)?.[1]) || undefined
+    return { name: w, ...details(words, i + 1), form, layout: 'ticket', qtyInLine, ...base }
   }
+  return undefined
 }
 
 // OCR sometimes drops "اسم", so key on المريض — but not the "خاص بالمريض" title.

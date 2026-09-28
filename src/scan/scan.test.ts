@@ -13,6 +13,8 @@ import QTY from './fixtures/qty-column.json'
 import OCR from './fixtures/case-sample.ocr.txt?raw'
 import BROWSER_OCR from './fixtures/case-sample.browser.ocr.txt?raw'
 import SEED from '../../seed/medications.csv?raw'
+import TICKET from './fixtures/ticket.ocr.txt?raw'
+import { mergePasses } from './passes'
 
 describe('parseCase', () => {
   const parsed = parseCase(OCR)
@@ -214,5 +216,60 @@ describe('mergePages', () => {
       { text: OCR, starCard: '555555' },
     ])
     expect(merged.mismatchedPages).toEqual([2])
+  })
+})
+
+describe('pharmacy ticket (تذكرة طبية)', () => {
+  it('finds the med rows: name first, then strength, unit and form', () => {
+    const meds = parseCase(TICKET).meds
+    expect(meds.map((m) => m.name)).toEqual(['أسينيمت', 'رامكسول', 'بلادوجرا', 'أسوفيناسين', 'ايافلوزيميت'])
+    expect(meds.every((m) => m.layout === 'ticket')).toBe(true)
+    // "| 20" survived OCR on the first row only.
+    expect(meds[0]!.qtyInLine).toBe(20)
+    expect(meds.find((m) => m.name === 'أسوفيناسين')!.strength).toBe('10')
+  })
+
+  it('matches names despite a border read as a leading alef', async () => {
+    const products = [{ id: 1, nameEn: 'Sinemet', nameAr: 'سينيميت', categories: [], verified: true }]
+    expect(matchProduct('أسينيمت', products)?.nameEn).toBe('Sinemet')
+  })
+
+  it('does not take form labels or header noise for meds', () => {
+    for (const noise of ['8 2 الصيدليهة 7', 'وزارة الدفاع', 'ل - اي النضعة مم 0', 'الاج جل 557']) {
+      expect(parseCase(noise).meds).toEqual([])
+    }
+  })
+
+  it('reads the requested quantity through border marks stuck to it', () => {
+    const qty = (line: string) => parseCase(line).meds[0]?.qtyInLine
+    expect(qty('١ 3 بلادوجرا 5٠ مجم 1.20 ق] 1')).toBe(20)
+    expect(qty('3 بلادوجرا 5٠ مجم #20 ]')).toBe(20)
+    expect(qty('2 رامكسول ١ مجم | ٍ')).toBeUndefined()
+  })
+
+  it('keeps case-sheet rows that lost their leading اقراص', () => {
+    const name = (line: string) => parseCase(line).meds[0]?.name
+    expect(name('ا جلوكوفاج ٠ اكس آر اقراص مرة فى اليوم عند الحاجة')).toBe('جلوكوفاج')
+    expect(name('اذ فورسيجا ١٠.مم مرة فى اليوم عند الحاجة لمدة ١ شهر')).toBe('فورسيجا')
+  })
+})
+
+describe('mergePasses', () => {
+  const line = (text: string, y: number) => ({ text, bbox: { x0: 0, y0: y, x1: 100, y1: y + 20 }, words: [] })
+
+  it('adds med rows only the second read found, in page order, without duplicates', () => {
+    const first = [line('اسم المريض ح- لواء / هاله', 0), line('١ اقراص لانوكسين ١ مجم', 100), line('١ اقراص كونكور ٥ مجم', 200)]
+    const second = [
+      line('١ اقراص لانوكسن ١ مجم', 102), // same row, misread: skip
+      line('١ اقراص ميلجا اقراص مرة', 150), // only here: add
+      line('١ اقراص كونكور ٥ مجم', 260), // same drug elsewhere: skip
+    ]
+    const merged = mergePasses(first, second, 25)
+    expect(merged.map((l) => l.text)).toEqual([first[0]!.text, first[1]!.text, second[1]!.text, first[2]!.text])
+  })
+
+  it('recovers the patient line when the first read lost it', () => {
+    const merged = mergePasses([line('١ اقراص لانوكسين ١ مجم', 100)], [line('اسم المريض ح- لواء / هاله', 0)], 25)
+    expect(parseCase(merged.map((l) => l.text).join('\n')).name).toBe('هاله')
   })
 })

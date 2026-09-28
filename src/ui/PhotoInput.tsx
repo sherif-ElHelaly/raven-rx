@@ -9,7 +9,8 @@ interface PhotoInputProps {
 }
 
 export function PhotoInput({ value, onChange, label = 'Photo' }: PhotoInputProps) {
-  const inputRef = useRef<HTMLInputElement>(null)
+  const cameraRef = useRef<HTMLInputElement>(null)
+  const libraryRef = useRef<HTMLInputElement>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
@@ -49,9 +50,17 @@ export function PhotoInput({ value, onChange, label = 'Photo' }: PhotoInputProps
             type="button"
             className="btn"
             disabled={busy}
-            onClick={() => inputRef.current?.click()}
+            onClick={() => cameraRef.current?.click()}
           >
             {busy ? 'Processing…' : value ? 'Retake' : 'Take photo'}
+          </button>
+          <button
+            type="button"
+            className="btn"
+            disabled={busy}
+            onClick={() => libraryRef.current?.click()}
+          >
+            Library
           </button>
           {value && (
             <button type="button" className="btn btn--ghost" onClick={() => onChange(undefined)}>
@@ -60,13 +69,15 @@ export function PhotoInput({ value, onChange, label = 'Photo' }: PhotoInputProps
           )}
         </div>
         <input
-          ref={inputRef}
+          ref={cameraRef}
           type="file"
           accept="image/*"
           capture="environment"
           hidden
           onChange={handleFile}
         />
+        {/* No `capture`: iOS opens the photo library picker instead of the camera. */}
+        <input ref={libraryRef} type="file" accept="image/*" hidden onChange={handleFile} />
       </div>
     </div>
   )

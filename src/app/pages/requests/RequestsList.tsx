@@ -20,9 +20,14 @@ export function RequestsList() {
     <div className="page">
       <div className="drugs-header">
         <h1 className="page__title">Requests</h1>
-        <Link to="/add" className="btn btn--primary drugs-header__add">
-          + New
-        </Link>
+        <div className="drugs-header__actions">
+          <Link to="/scan" className="btn drugs-header__add">
+            Scan sheet
+          </Link>
+          <Link to="/add" className="btn btn--primary drugs-header__add">
+            + New
+          </Link>
+        </div>
       </div>
 
       <div className="segmented" role="tablist">

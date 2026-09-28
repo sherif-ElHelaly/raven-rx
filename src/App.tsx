@@ -4,6 +4,7 @@ import { TabBar } from './app/TabBar'
 import { ProductDetail } from './app/pages/drugs/ProductDetail'
 import { ProductForm } from './app/pages/drugs/ProductForm'
 import { ProductList } from './app/pages/drugs/ProductList'
+import { UnregisteredMeds } from './app/pages/drugs/UnregisteredMeds'
 import { PresentationForm } from './app/pages/drugs/PresentationForm'
 import { Home } from './app/pages/Home'
 import { ItemsFiltered } from './app/pages/ItemsFiltered'
@@ -14,6 +15,7 @@ import { NewRequest } from './app/pages/requests/NewRequest'
 import { RequestDetail } from './app/pages/requests/RequestDetail'
 import { RequestHandover } from './app/pages/requests/RequestHandover'
 import { RequestsList } from './app/pages/requests/RequestsList'
+import { ScanCase } from './app/pages/requests/ScanCase'
 import { ShoppingList } from './app/pages/requests/ShoppingList'
 import { Search } from './app/pages/Search'
 import { Settings } from './app/pages/settings/Settings'
@@ -46,6 +48,7 @@ function App() {
             <Route path="/requests/:requestId" element={<RequestDetail />} />
             <Route path="/requests/:requestId/handover" element={<RequestHandover />} />
             <Route path="/add" element={<NewRequest />} />
+            <Route path="/scan" element={<ScanCase />} />
 
             <Route path="/people/:personId" element={<PersonDetail />} />
 
@@ -55,6 +58,7 @@ function App() {
 
             <Route path="/drugs" element={<ProductList />} />
             <Route path="/drugs/new" element={<ProductForm />} />
+            <Route path="/drugs/unregistered" element={<UnregisteredMeds />} />
             <Route path="/drugs/:productId" element={<ProductDetail />} />
             <Route path="/drugs/:productId/edit" element={<ProductForm />} />
             <Route path="/drugs/:productId/presentations/new" element={<PresentationForm />} />

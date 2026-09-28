@@ -45,6 +45,18 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,ico,csv}'],
+        // Case-sheet OCR engine + Arabic model (src/scan/ocr.ts): fetched once, then offline.
+        runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.hostname === 'cdn.jsdelivr.net' && /tesseract/.test(url.pathname),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'ocr-engine',
+              expiration: { maxEntries: 20 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+        ],
       },
     }),
   ],

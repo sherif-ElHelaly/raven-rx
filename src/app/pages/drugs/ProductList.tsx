@@ -15,6 +15,14 @@ export function ProductList() {
   const index = useSearchIndex()
   const products = useLiveQuery(() => db.products.toArray(), [])
   const presentations = useLiveQuery(() => db.presentations.toArray(), [])
+  const unregisteredCount = useMemo(
+    () =>
+      new Set([
+        ...(products ?? []).filter((p) => p.unregistered).map((p) => p.id),
+        ...(presentations ?? []).filter((p) => p.unregistered).map((p) => p.productId),
+      ]).size,
+    [products, presentations],
+  )
 
   const categoryList = useMemo(() => {
     if (!products) return []
@@ -74,6 +82,15 @@ export function ProductList() {
         </Link>
       </div>
 
+      {unregisteredCount > 0 && (
+        <Link to="/drugs/unregistered" className="unregistered-banner">
+          <span>
+            <strong>{unregisteredCount}</strong> unregistered med{unregisteredCount === 1 ? '' : 's'} from scanned cases
+          </span>
+          <span aria-hidden>›</span>
+        </Link>
+      )}
+
       <input
         className="field__input drugs-search"
         type="search"
@@ -117,7 +134,11 @@ export function ProductList() {
                   </span>
                 </div>
                 <div className="drug-list__flags">
-                  {!p.verified && <span className="badge badge--muted">unverified</span>}
+                  {p.unregistered ? (
+                    <span className="badge badge--warn">unregistered</span>
+                  ) : (
+                    !p.verified && <span className="badge badge--muted">unverified</span>
+                  )}
                   {flags?.fridge && <span aria-label="requires fridge">❄️</span>}
                   {flags?.controlled && <span aria-label="controlled drug">⚠️</span>}
                 </div>

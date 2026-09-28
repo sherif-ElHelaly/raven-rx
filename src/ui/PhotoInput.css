@@ -28,6 +28,7 @@
 }
 
 .photo-input__actions {
+  flex-wrap: wrap;
   display: flex;
   gap: var(--space-2);
 }

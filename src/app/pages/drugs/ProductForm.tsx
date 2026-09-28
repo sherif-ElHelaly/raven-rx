@@ -40,7 +40,8 @@ export function ProductForm() {
 
   useEffect(() => {
     if (existing) {
-      setNameEn(existing.nameEn)
+      // A scanned placeholder carries its Arabic name in nameEn until filled in.
+      setNameEn(existing.unregistered && existing.nameEn === existing.nameAr ? '' : existing.nameEn)
       setNameAr(existing.nameAr)
       setManufacturer(existing.manufacturer ?? '')
       setNotes(existing.notes ?? '')
@@ -95,6 +96,7 @@ export function ProductForm() {
       verified,
       categories: [...categories],
       photo,
+      unregistered: false,
     }
     try {
       if (isEdit && id !== undefined) {
@@ -205,7 +207,7 @@ export function ProductForm() {
         </label>
 
         <button type="submit" className="btn btn--primary btn--block" disabled={!canSave}>
-          {saving ? 'Saving…' : 'Save'}
+          {saving ? 'Saving…' : existing?.unregistered ? 'Save & mark registered' : 'Save'}
         </button>
       </form>
     </div>

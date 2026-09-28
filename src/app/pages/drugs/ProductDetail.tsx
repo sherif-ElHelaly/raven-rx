@@ -68,6 +68,7 @@ export function ProductDetail() {
           </p>
         </div>
 
+        {product.unregistered && <span className="badge badge--warn">unregistered</span>}
         {!product.verified && <span className="badge badge--muted">unverified</span>}
 
         {ingredientNames && ingredientNames.length > 0 && (
@@ -129,6 +130,7 @@ export function ProductDetail() {
                     {pres.form}
                   </span>
                   <span className="presentation-list__flags">
+                    {pres.unregistered && <span className="badge badge--warn">unregistered</span>}
                     {pres.fridge && <span aria-label="requires fridge">❄️</span>}
                     {pres.controlled && <span aria-label="controlled drug">⚠️</span>}
                   </span>

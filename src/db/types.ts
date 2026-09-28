@@ -168,6 +168,9 @@ export interface Product {
   photo?: Blob
   verified: boolean
   notes?: string
+  // Created from a scanned case sheet with only its Arabic name; listed under
+  // Unregistered meds until the details are filled in.
+  unregistered?: boolean
 }
 
 export interface Presentation {
@@ -179,6 +182,8 @@ export interface Presentation {
   photo?: Blob
   fridge: boolean
   controlled: boolean
+  // A strength first seen on a scanned case sheet, not yet checked.
+  unregistered?: boolean
 }
 
 export interface Ingredient {

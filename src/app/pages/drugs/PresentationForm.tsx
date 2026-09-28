@@ -49,6 +49,7 @@ export function PresentationForm() {
       fridge,
       controlled,
       photo,
+      unregistered: false,
     }
     try {
       if (isEdit) {
@@ -127,7 +128,7 @@ export function PresentationForm() {
         </label>
 
         <button type="submit" className="btn btn--primary btn--block" disabled={saving}>
-          {saving ? 'Saving…' : 'Save'}
+          {saving ? 'Saving…' : existing?.unregistered ? 'Save & mark registered' : 'Save'}
         </button>
       </form>
     </div>
